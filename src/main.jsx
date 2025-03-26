@@ -16,5 +16,3 @@ createRoot(document.getElementById('root')).render(
     </>
   </StrictMode>
 )
-
-// 29:59

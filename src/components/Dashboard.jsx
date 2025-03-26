@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { UserAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import GetPlayer from "../services/getPlayer";
+import UpdatePlayer from "../services/UpdatePlayer";
 
 const Dashboard = () => {
     const { session, signOut } = UserAuth();
@@ -32,7 +34,10 @@ const Dashboard = () => {
                 >
                     Signout 
                 </p>
+                <GetPlayer />
+                <UpdatePlayer />
             </div>
+        
         </div>
     )
 }
