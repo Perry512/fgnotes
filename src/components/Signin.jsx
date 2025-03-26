@@ -11,7 +11,7 @@ export const Signin = () => {
 
     const { session, signInUser } = UserAuth();
     const navigate = useNavigate();
-    console.log(email, password, error);
+    // console.log(email, password, error);
 
     const handleSignIn = async(e) => {
         e.preventDefault();

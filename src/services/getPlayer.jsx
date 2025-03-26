@@ -34,7 +34,7 @@ export const GetPlayer = () => {
         }
         
         setLoading(false);
-        console.log(Player, loading);
+        console.log("Player tag: ", Player, "\nLoading? ",  loading);
 
     } 
 
