@@ -11,17 +11,21 @@ export const Signup = () => {
 
     const { session, signUpNewUser } = UserAuth();
     const navigate = useNavigate()
-    console.log(session);
+
     console.log(email, password);
 
     const handleSignUp = async(e) => {
         e.preventDefault()
         setLoading(true)
-        try{
-            const result = await signUpNewUser(email, password)
+        setError('');
 
-            if(result.success){
+        try{
+            const result = await signUpNewUser(email, password);
+
+            if(result.success) {
                 navigate('/dashboard')
+            } else {
+                setError(result.error || "An error occurred during signup.");
             }
         } catch (error) {
             setError("an error occured")

@@ -7,18 +7,48 @@ export const AuthContextProvider = ({ children }) => {
 
     const [session, setSession] = useState();
 
+    // Create Player
+    const createPlayer = async (userId) => {
+        try {
+            console.log("Creating player for userId:", userId);
+            const { data, error } = await supabase
+                .from('Player')
+                .insert([{ internal_id: userId }])
+                .select();
+
+            if (error) {
+                console.error("Error creating player:", error.message);
+                return { success: false, error: error.message };
+            }
+            console.log("Player created successfully:", data);
+            return { success: true, data };
+        } catch (err) {
+            console.error("Unexpected error:", err.message);
+            return { success: false, error: err.message };
+        }
+    };
+
     //Sign up
     const signUpNewUser = async (email, password) => {
-        const  { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
         });
+
         if (error) {
-            console.error("there was an error signing up: ", error);
-            return { success: false, error};
+            console.error("Signup error:", error);
+            return { success: false, error };
         }
+
+        const userId = data?.user?.id;
+        if (userId) {
+            console.log("User signed up successfully, creating player...");
+            await createPlayer(userId);
+        }
+
         return { success: true, data };
-    };
+
+    }
 
     // sign in
     const signInUser = async(email, password) => {
