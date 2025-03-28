@@ -6,7 +6,7 @@ export const UpdatePlayer = () => {
     
     const [error, setError] = useState('');
     const [loading, setLoading] = useState('');
-    const [tag, setTag] = useState(null);
+    const [gamesPlayed, setGamesPlayed] = useState(null);
     
     const { session } = UserAuth();
 
@@ -14,10 +14,9 @@ export const UpdatePlayer = () => {
         e.preventDefault();
         setLoading(true);
 
-
         const { data: Player, error } = await supabase
             .from('Player')
-            .update({ tag: tag })
+            .update({ gamesPlayed: tag })
             .eq('internal_id', session?.user?.id)
 
         if (error) {
@@ -29,9 +28,7 @@ export const UpdatePlayer = () => {
 
         } else {
             setTag(tag);
-
         }
-
         setLoading(false);
         console.log(Player, loading);
         

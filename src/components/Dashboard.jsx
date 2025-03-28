@@ -3,6 +3,7 @@ import { UserAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import GetPlayer from "../services/getPlayer";
 import UpdatePlayer from "../services/UpdatePlayerTag";
+import { Dropdown } from "../components/Dropdown";
 
 const Dashboard = () => {
     const { session, signOut } = UserAuth();
@@ -17,7 +18,7 @@ const Dashboard = () => {
             await signOut()
             navigate("/");
         } catch (error) {
-            setError("An unexpected error occured")
+            setError("An unexpected error occured");
         }
     };
     
@@ -36,6 +37,7 @@ const Dashboard = () => {
                 </p>
                 <GetPlayer />
                 <UpdatePlayer />
+                <Dropdown />
             </div>
         
         </div>
