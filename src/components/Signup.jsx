@@ -12,7 +12,7 @@ export const Signup = () => {
     const { session, signUpNewUser } = UserAuth();
     const navigate = useNavigate()
 
-    console.log(email, password);
+    // console.log(email, password);
 
     const handleSignUp = async(e) => {
         e.preventDefault()
