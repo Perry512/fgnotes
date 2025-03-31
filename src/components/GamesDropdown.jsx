@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { GAMES } from '../constants/games';
+import { UpdatePlayerGamesPlayed } from '../services/UpdatePlayerGamesPlayed';
+import { UserAuth } from '../context/AuthContext';
 
 const games = Object.values(GAMES);
 
-export function Dropdown() {
+export function GamesDropdown() {
   const [selectedGames, setSelectedGames] = useState([]);
+  const { session } = UserAuth();
 
   const handleToggle = (game, event) => {
     event.stopPropagation();
@@ -15,8 +18,9 @@ export function Dropdown() {
     );
   };
 
-  const handleExit = () => {
+  const handleExit = async () => {
     console.log('Selected Games:', selectedGames);
+    await UpdatePlayerGamesPlayed(selectedGames, session);
   };
 
   return (
@@ -53,7 +57,10 @@ export function Dropdown() {
               onClick={handleExit}
               className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
             >
-              EXIT
+              Save and Exit
+            </button>
+            <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900">
+              Exit without saving
             </button>
           </MenuItem>
         </div>
@@ -62,4 +69,4 @@ export function Dropdown() {
   );
 }
 
-export default Dropdown;
+export default GamesDropdown;

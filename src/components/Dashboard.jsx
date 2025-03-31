@@ -3,7 +3,7 @@ import { UserAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import GetPlayer from "../services/getPlayer";
 import UpdatePlayer from "../services/UpdatePlayerTag";
-import { Dropdown } from "../components/Dropdown";
+import GamesDropdown from "../components/GamesDropdown";
 
 const Dashboard = () => {
     const { session, signOut } = UserAuth();
@@ -35,7 +35,7 @@ const Dashboard = () => {
                 >
                     Signout 
                 </p>
-                <Dropdown />
+                <GamesDropdown />
                 <GetPlayer />
                 <UpdatePlayer />
             </div>
