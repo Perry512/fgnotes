@@ -35,9 +35,9 @@ const Dashboard = () => {
                 >
                     Signout 
                 </p>
+                <Dropdown />
                 <GetPlayer />
                 <UpdatePlayer />
-                <Dropdown />
             </div>
         
         </div>
