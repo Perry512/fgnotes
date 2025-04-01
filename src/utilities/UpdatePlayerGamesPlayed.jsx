@@ -9,7 +9,7 @@ export const UpdatePlayerGamesPlayed = async (gamesPlayed, session) => {
 
     const { error } = await supabase
         .from('Player')
-        .update({ games_played: [gamesPlayed] })
+        .upsert({ games_played: gamesPlayed })
         .eq('internal_id', session.user.id);
 
     if (error) {

@@ -16,10 +16,16 @@ export const GetPlayer = () => {
         e.preventDefault();
         setLoading(true);
 
+        if (!session?.user?.id) {
+            console.error("No session found");
+            return;
+        }
+
         const { data: Player, error } = await supabase
             .from('Player')
             .select('*')
-            .eq('internal_id', session?.user?.id)
+            .eq('internal_id', session.user.id)
+            .select()
 
         if (error) {
             setError(error);
