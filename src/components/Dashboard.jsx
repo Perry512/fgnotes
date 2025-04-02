@@ -7,6 +7,7 @@ import GamesDropdown from "../components/GamesDropdown";
 import { getPlayerTag } from "../utilities/getPlayerTag";
 import PostNote from "./PostNote";
 import FetchPlayerTag from "./FetchPlayer";
+import DisplayNote from "./DisplayNote";
 
 const Dashboard = () => {
     const { session, signOut } = UserAuth();
@@ -23,8 +24,6 @@ const Dashboard = () => {
             setError("An unexpected error occured");
         }
     };
-    
-    console.log(getTag);
 
     return (
         <div> 
@@ -37,6 +36,7 @@ const Dashboard = () => {
                 >
                     Signout 
                 </p>
+                <DisplayNote />
                 <PostNote />
                 <GamesDropdown />
                 <GetPlayer />

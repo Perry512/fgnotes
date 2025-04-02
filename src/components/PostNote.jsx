@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Textarea } from '@headlessui/react';
 import { createNoteService } from '../services/createNoteService';
+import { UserAuth } from '../context/AuthContext';
 
 export default function PostNote() {
   const [loading, setLoading] = useState(false);
@@ -8,16 +9,18 @@ export default function PostNote() {
   const [title, setTitle] = useState(null);
   const [content, setContent] = useState(null);
 
+  const { session } = UserAuth();
+
   const handleCreateNote = async(e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const result = await createNoteService(title, content);
+      const result = await createNoteService(session, title, content);
 
       if (result.success) {
-        return {success: true } 
+        return { success: true } 
       } else { 
         setError(result.error || "An error has occured creating note");
       }
@@ -32,7 +35,7 @@ export default function PostNote() {
     <div>
       <Textarea onChange={(e) => {setTitle(e.target.value)}} placeholder='Title' className="flex"></Textarea>
       <Textarea onChange={(e) => {setContent(e.target.value)}} name="description" placeholder='content'></Textarea>
-      <button className='mt-6 w-full' type='submit'> Post Note </button>
+      <button className='mt-6 w-full' type='submit' onClick={handleCreateNote}> Post Note </button>
     </div>
   )
 }
