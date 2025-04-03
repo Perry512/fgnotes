@@ -18,5 +18,5 @@ export const getNotesFull = async (session) => {
         return { error }
     }
 
-    return {...data};
+    return data;
 };

@@ -23,7 +23,7 @@ export default function DisplayNote() {
     
                 if (error) {
                     console.error("Error fetching note:", error);
-                    setError(error.message || "Unknown error fetching notes");
+                    setError(error.message || "Unknown error fetching note");
                 } else if (note) {
                     setTitle(note.note_title);
                     setContent(note.note_content);

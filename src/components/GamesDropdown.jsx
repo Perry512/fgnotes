@@ -1,26 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { GAMES } from '../constants/games';
-import { UpdatePlayerGamesPlayed } from '../utilities/UpdatePlayerGamesPlayed';
+import { supabase } from '../supabaseClient';
 import { UserAuth } from '../context/AuthContext';
+import { GAMES } from '../constants/games';
 
 const games = Object.values(GAMES);
 
 export function GamesDropdown() {
+  const { session, player } = UserAuth();
   const [selectedGames, setSelectedGames] = useState([]);
-  const { session } = UserAuth();
 
-  const handleToggle = (game, event) => {
-    event.stopPropagation();
-    setSelectedGames((prev) =>
-      prev.includes(game) ? prev.filter((g) => g !== game) : [...prev, game]
-    );
+  // 🔹 Sync local state when `player.games_played` changes
+  useEffect(() => {
+    if (player?.games_played) {
+      setSelectedGames(player.games_played);
+    }
+  }, [player?.games_played]);
+
+  // 🔹 Toggle game selection
+  const handleToggle = (game) => {
+    setSelectedGames((prev) => {
+      return prev.includes(game)
+        ? prev.filter((g) => g !== game)
+        : [...prev, game];
+    });
   };
 
-  const handleExit = async () => {
-    console.log('Selected Games:', selectedGames);
-    await UpdatePlayerGamesPlayed(selectedGames, session);
+  // 🔹 Save selected games to Supabase
+  const handleSave = async () => {
+    if (!session?.user?.id) {
+      console.error("No user session found.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from('Player')
+      .update({ games_played: selectedGames })
+      .eq('internal_id', session.user.id);
+
+    if (error) {
+      console.error("Error updating games played:", error);
+    } else {
+      console.log("Games played updated successfully");
+    }
   };
 
   return (
@@ -37,29 +60,28 @@ export function GamesDropdown() {
       >
         <div className="py-1">
           {games.map((game, index) => (
-            <MenuItem key={index} as="div">
-              <label
-                className="flex items-center px-4 py-2 text-sm text-gray-700 cursor-pointer data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
-                onClick={(e) => handleToggle(game, e)}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedGames.includes(game)}
-                  readOnly
-                  className="mr-2"
-                />
-                {game}
-              </label>
-            </MenuItem>
+            <div key={index} className="flex items-center px-4 py-2 text-sm text-gray-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedGames.includes(game)}
+                onChange={() => handleToggle(game)}
+                className="mr-2"
+              />
+              {game}
+            </div>
           ))}
+
+          {/* 🔹 Save and Exit / Exit without Saving */}
           <MenuItem as="div">
             <button
-              onClick={handleExit}
-              className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+              onClick={handleSave}
+              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
             >
               Save and Exit
             </button>
-            <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900">
+            <button
+              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+            >
               Exit without saving
             </button>
           </MenuItem>

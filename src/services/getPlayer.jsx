@@ -1,59 +1,22 @@
-import React, { useState } from "react";
 import { UserAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "../supabaseClient";
 
-export const GetPlayer = () => {
-    
-    const [error, setError] = useState('');
-    const [player, setPlayer] = useState([]);
-    const [loading, setLoading] = useState(false); 
-    
-    const { session } = UserAuth();
-    const navigate = useNavigate();
+export default function GetPlayer() {
+    const { player } = UserAuth();
 
-    const handleGetPlayer = async(e) => {
-        e.preventDefault();
-        setLoading(true);
-
-        if (!session?.user?.id) {
-            console.error("No session found");
-            return;
-        }
-
-        const { data: Player, error } = await supabase
-            .from('Player')
-            .select('*')
-            .eq('internal_id', session.user.id)
-            .select()
-
-        if (error) {
-            setError(error);
-            setPlayer(null);
-            setTimeout(() => {
-                setError("");
-            }, 3000);
-
-        } else {
-            setPlayer(Player);
-
-        }
-        
-        setLoading(false);
-        console.log("Player tag: ", Player, "\nLoading? ",  loading);
-
-    } 
-
+    // console.log("Player status: ", player);
     return (
-        <>
-            <form>
-                <h1> Get Player </h1>
-                <button className="mt-6 w-full" type="submit" onClick={handleGetPlayer}> get player </button>
-                {error && <p className="text-red-600 text center pt-4"> {error} </p>}
-            </form>
-        </>
-    )
-    
+        <div>
+            <h1>Player Profile</h1>
+            {player ? (
+                <div className="border p-4">
+                    <h2 className="text-lg font-bold">{player.tag}</h2>
+                    <p><strong>Games Played:</strong> {player.games_played.join(", ")}</p>
+                    <p><strong>Created At:</strong> {new Date(player.created_at).toLocaleString()}</p>
+                    <p><strong>Updated At:</strong> {new Date(player.updated_at).toLocaleString()}</p>
+                </div>
+            ) : (
+                <p>No player data found.</p>
+            )}
+        </div>
+    );
 }
-
-export default GetPlayer;

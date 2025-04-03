@@ -28,7 +28,6 @@ export const Signin = () => {
         }
 
         if (session) {
-            closeModal();
             setError("");
         }
     }
