@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import { UserAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -7,22 +7,26 @@ export const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const { session, signUpNewUser } = UserAuth();
     const navigate = useNavigate()
 
+    useEffect(() => {
+        if (session) {
+            navigate("/dashboard");
+        }
+    }, [session, navigate]);
+
     const handleSignUp = async(e) => {
-        e.preventDefault()
-        setLoading(true)
+        e.preventDefault();
+        setLoading(true);
         setError('');
 
         try{
             const result = await signUpNewUser(email, password);
 
-            if(result.success) {
-                navigate('/dashboard')
-            } else {
+            if(!result.success) {
                 setError(result.error || "An error occurred during signup.");
             }
         } catch (error) {

@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState, useContext } from "react";
 import { supabase } from "../supabaseClient";
+import { fetchAndCachePlayer, getCachedPlayer } from "../utilities/playerUtils";
 
 const AuthContext = createContext();
 
@@ -91,34 +92,35 @@ export const AuthContextProvider = ({ children }) => {
 
     // State Listener
     useEffect(() => {
-        // Fetch the session from supabase
         const initializeSession = async () => {
-            const  { data, error } = await supabase.auth.getSession();
-
+            setLoading(true);
+            const { data, error } = await supabase.auth.getSession();
+    
             if (error) {
                 console.error("Error fetching session: ", error);
-                return;
+            } else {
+                setSession(data.session);
+                if (data.session?.user?.id) {
+                    fetchPlayer(data.session.user.id);
+                }
             }
-
-            setSession(data.session);
-            if (data.session?.user?.id) {
-                fetchPlayer(data.session.user.id);
-            }
-
+    
             setLoading(false);
         };
-
+    
         initializeSession();
-
-        const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-            setSession(newSession);
-            if (newSession?.user?.id) {
-                fetchPlayer(newSession.user.id);
+    
+        const { data: listener } = supabase.auth.onAuthStateChange((_event, session ) => {
+            setSession(session);
+            if (session?.user?.id) {
+                fetchAndCachePlayer(session.user.id);
             } else {
                 setPlayer(null);
             }
         });
 
+        setLoading(false);
+    
         return () => {
             listener?.subscription?.unsubscribe();
         };
@@ -191,7 +193,7 @@ export const AuthContextProvider = ({ children }) => {
     if (loading) return <div> Loading, please stand by </div>;
 
     return (
-        <AuthContext.Provider value={{ session, signUpNewUser, signOut, signInUser, player }}>
+        <AuthContext.Provider value={{ session, signUpNewUser, signOut, signInUser, player, loading }}>
             {children}
         </AuthContext.Provider>
     );

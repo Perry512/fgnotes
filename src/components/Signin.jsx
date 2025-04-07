@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useEffect, useState } from "react";
 import { UserAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -9,9 +9,14 @@ export const Signin = () => {
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState('');
 
-    const { session, signInUser } = UserAuth();
+    const { session, signInUser  } = UserAuth();
     const navigate = useNavigate();
-    // console.log(email, password, error);
+
+    useEffect(() => {
+        if (session) { 
+            navigate("/dashboard")
+        }
+    }, [session, navigate])
 
     const handleSignIn = async(e) => {
         e.preventDefault();
@@ -27,9 +32,6 @@ export const Signin = () => {
             navigate("/dashboard");
         }
 
-        if (session) {
-            setError("");
-        }
     }
 
     return (
