@@ -9,8 +9,6 @@ const PrivateRoute = ({ children }) => {
         return <div> Loading, please stand by </div>
     }
 
-    console.log(session)
-
     return session ? children : <Navigate to="/signup" />;
 }
 
