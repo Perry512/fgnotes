@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import { supabase } from '../supabaseClient';
-import { UserAuth } from '../context/AuthContext';
-import { GAMES } from '../constants/games';
-
-const games = Object.values(GAMES);
+import React, { useEffect, useState } from "react";
+import { supabase } from "../supabaseClient";
+import { UserAuth } from "../context/AuthContext";
+import { GAMES } from "../constants/games";
+import { MultiSelectDropdown } from "./MultiSelectDropdown";
 
 export function GamesDropdown() {
   const { session, player } = UserAuth();
@@ -16,14 +13,6 @@ export function GamesDropdown() {
       setSelectedGames(player.games_played);
     }
   }, [player?.games_played]);
-
-  const handleToggle = (game) => {
-    setSelectedGames((prev) => {
-      return prev.includes(game)
-        ? prev.filter((g) => g !== game)
-        : [...prev, game];
-    });
-  };
 
   const handleSave = async () => {
     if (!session?.user?.id) {
@@ -44,46 +33,13 @@ export function GamesDropdown() {
   };
 
   return (
-    <Menu as="div" className="relative inline-block text-left">
-      <div>
-        <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-red-700 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
-          Select Games
-          <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-gray-400" />
-        </MenuButton>
-      </div>
-
-      <MenuItems
-        className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-none"
-      >
-        <div className="py-1">
-          {games.map((game, index) => (
-            <div key={index} className="flex items-center px-4 py-2 text-sm text-gray-700 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedGames.includes(game)}
-                onChange={() => handleToggle(game)}
-                className="mr-2"
-              />
-              {game}
-            </div>
-          ))}
-
-          <MenuItem as="div">
-            <button
-              onClick={handleSave}
-              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Save and Exit
-            </button>
-            <button
-              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Exit without saving
-            </button>
-          </MenuItem>
-        </div>
-      </MenuItems>
-    </Menu>
+    <MultiSelectDropdown
+      label="Select Games"
+      options={Object.values(GAMES)}
+      selected={selectedGames}
+      onChange={setSelectedGames}
+      onSave={handleSave}
+    />
   );
 }
 

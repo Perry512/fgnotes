@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getNotesFull } from "../services/getNotesFull";
 import { UserAuth } from "../context/AuthContext";
+import { fetchNotes } from "../utilities/fetchNotes";
 
 export default function DisplayNotesFull() {
     const { session } = UserAuth();
@@ -18,7 +18,7 @@ export default function DisplayNotesFull() {
 
             setLoading(true);
             try {
-                const result = await getNotesFull(session);
+                const result = await fetchNotes(session, {single:false});
 
                 if(result.error) {
                     console.error("Error fetching note: ", error)
