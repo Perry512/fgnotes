@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState, useContext } from "react";
 import { supabase } from "../supabaseClient";
-import { fetchAndCachePlayer, getCachedPlayer } from "../utilities/playerUtils";
+import { clearCachedPlayer, fetchAndCachePlayer, getCachedPlayer } from "../utilities/playerUtils";
+import { runSupabaseQuery } from "../utilities/runSupabaseQuery";
 
 const AuthContext = createContext();
 
@@ -10,41 +11,32 @@ export const AuthContextProvider = ({ children }) => {
     const [player, setPlayer] = useState(null);
 
     // Fetch player data from the database
-    const fetchPlayer = async (userId) => {
-        if (!userId) return;
+    // const fetchPlayer = async (userId) => {
+    //     if (!userId) return;
 
-        const { data, error } = await supabase
-            .from("Player")
-            .select("*")
-            .eq("internal_id", userId)
-            .single();
+    //     const { data, error } = await supabase
+    //         .from("Player")
+    //         .select("*")
+    //         .eq("internal_id", userId)
+    //         .single();
 
-        if (error) {
-            console.error("Error fetching player:", error);
-        } else {
-            setPlayer(data);
-        }
-    };
+    //     if (error) {
+    //         console.error("Error fetching player:", error);
+    //     } else {
+    //         setPlayer(data);
+    //     }
+    // };
 
     // Create Player
     const createPlayer = async (userId) => {
-        try {
-            console.log("Creating player for userId:", userId);
-            const { data, error } = await supabase
-                .from('Player')
-                .insert([{ internal_id: userId }])
-                .select();
 
-            if (error) {
-                console.error("Error creating player:", error.message);
-                return { success: false, error: error.message };
-            }
-            console.log("Player created successfully:", data);
-            return { success: true, data };
-        } catch (err) {
-            console.error("Unexpected error:", err.message);
-            return { success: false, error: err.message };
-        }
+        const query = await supabase
+            .from('Player')
+            .insert([{ internal_id: userId }])
+            .select();
+
+        runSupabaseQuery(query);
+        
     };
 
     // Sign up
@@ -95,27 +87,38 @@ export const AuthContextProvider = ({ children }) => {
         const initializeSession = async () => {
             setLoading(true);
             const { data, error } = await supabase.auth.getSession();
-    
             if (error) {
                 console.error("Error fetching session: ", error);
             } else {
                 setSession(data.session);
                 if (data.session?.user?.id) {
-                    fetchPlayer(data.session.user.id);
+                    const cachedPlayer = getCachedPlayer();
+                    if (cachedPlayer) {
+                        setPlayer(cachedPlayer);
+                    } else {
+                        const player = await fetchAndCachePlayer(data.session.user.id);
+                        setPlayer(player);
+                    }
                 }
             }
-    
             setLoading(false);
         };
     
         initializeSession();
     
-        const { data: listener } = supabase.auth.onAuthStateChange((_event, session ) => {
+        const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
             setSession(session);
             if (session?.user?.id) {
-                fetchAndCachePlayer(session.user.id);
+                const cachedPlayer = getCachedPlayer();
+                if (cachedPlayer) {
+                    setPlayer(cachedPlayer);
+                } else {
+                    const player = await fetchAndCachePlayer(session.user.id);
+                    setPlayer(player);
+                }
             } else {
                 setPlayer(null);
+                clearCachedPlayer();
             }
         });
 
@@ -169,6 +172,7 @@ export const AuthContextProvider = ({ children }) => {
                 },
                 (payload) => {
                     console.log("New Player created: ", payload.new);
+                    localStorage.setItem("player", JSON.stringify(payload.new));
                     setPlayer(payload.new);
                 }
             )
@@ -187,13 +191,14 @@ export const AuthContextProvider = ({ children }) => {
         }
         setSession(null);
         setPlayer(null);
+        clearCachedPlayer();
         return { success: true };
     };
 
     if (loading) return <div> Loading, please stand by </div>;
 
     return (
-        <AuthContext.Provider value={{ session, signUpNewUser, signOut, signInUser, player, loading }}>
+        <AuthContext.Provider value={{ session, signUpNewUser, signOut, signInUser, player, loading, setPlayer }}>
             {children}
         </AuthContext.Provider>
     );

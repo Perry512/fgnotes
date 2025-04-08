@@ -16,6 +16,6 @@ export const getPlayerTag = async (session) => {
         console.error("Error fetching player tag:", error.message);
         return null;
     }
-
+    
     return Player?.tag || null;
 };

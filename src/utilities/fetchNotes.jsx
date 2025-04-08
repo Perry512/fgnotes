@@ -1,4 +1,5 @@
 import { supabase } from "../supabaseClient";
+import { runSupabaseQuery } from "./runSupabaseQuery";
 
 export const fetchNotes = async (session, { single = false } = {}) => {
     if (!session?.user?.id) {
@@ -16,12 +17,6 @@ export const fetchNotes = async (session, { single = false } = {}) => {
         query = query.limit(1).select();
     }
 
-    const { data, error } = await query;
+    return runSupabaseQuery(query);
 
-    if (error) {
-        console.error("Supabase fetch error: ", error);
-        return error;
-    }
-
-    return data;
 }

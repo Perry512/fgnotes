@@ -11,14 +11,12 @@ export function GamesDropdown() {
   const { session, player } = UserAuth();
   const [selectedGames, setSelectedGames] = useState([]);
 
-  // 🔹 Sync local state when `player.games_played` changes
   useEffect(() => {
     if (player?.games_played) {
       setSelectedGames(player.games_played);
     }
   }, [player?.games_played]);
 
-  // 🔹 Toggle game selection
   const handleToggle = (game) => {
     setSelectedGames((prev) => {
       return prev.includes(game)
@@ -27,7 +25,6 @@ export function GamesDropdown() {
     });
   };
 
-  // 🔹 Save selected games to Supabase
   const handleSave = async () => {
     if (!session?.user?.id) {
       console.error("No user session found.");
@@ -71,7 +68,6 @@ export function GamesDropdown() {
             </div>
           ))}
 
-          {/* 🔹 Save and Exit / Exit without Saving */}
           <MenuItem as="div">
             <button
               onClick={handleSave}

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import Signup from "./components/Signup";
-import Dashboard from "./components/Dashboard"; // Replace with your main app component
+import Dashboard from "./components/Dashboard";
 import { UserAuth } from "./context/AuthContext";
 
 function App() {
-  const { user } = UserAuth(); // Get user from AuthContext
+  const { user } = UserAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,7 +13,7 @@ function App() {
     }
   }, [user]);
 
-  if (loading) return <p>Loading...</p>; // Prevents flashing before user is determined
+  if (loading) return <p>Loading...</p>;
 
   return <>{user ? <Dashboard /> : <Signup />}</>;
 }

@@ -1,32 +1,46 @@
 import { supabase } from "../supabaseClient";
+import { runSupabaseQuery } from "./runSupabaseQuery";
+
+const PLAYER_CACHE_KEY = "cache:player";
+const EXPIRY_MS = 1000 * 60 * 5; // 5 mins
 
 export const fetchAndCachePlayer = async (userId) => {
-    try {
-        const { data, error } = await supabase
-            .from('Player')
-            .select('*')
-            .eq('internal_id', userId)
-            .single()
 
-        if (error) throw error;
+    const query = await supabase
+        .from('Player')
+        .select('*')
+        .eq('internal_id', userId)
+        .single()
+        
+    const data = await runSupabaseQuery(query);
+    if (!data) return null;
 
-        localStorage.setItem('player', JSON.stringify(data));
+    const payload = {
+        value: data,
+        expiry: Date.now() + EXPIRY_MS,
+    };
+
+    localStorage.setItem(PLAYER_CACHE_KEY, JSON.stringify(data));
         return data;
-    } catch (err) {
-        console.error("Error fetching player: ", err.message);
-        return null;
-    }
-};
+}
 
 export const getCachedPlayer = () => {
     try {
-        const cached = localStorage.getItem('player');
-        return cached ? JSON.parse(cached) : null;
+        const raw = localStorage.getItem(PLAYER_CACHE_KEY);
+        if (!raw) return null;
+
+        const { value, expiry } = JSON.parse(raw);
+        if (Date.now() > expiry) {
+            clearCachedPlayer();
+            return null;
+        }
+
+        return value;
     } catch {
         return null;
     }
 };
 
 export const clearCachedPlayer = () => {
-    localStorage.removeItem('player');
+    localStorage.removeItem(PLAYER_CACHE_KEY);
 };

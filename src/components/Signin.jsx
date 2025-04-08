@@ -14,7 +14,7 @@ export const Signin = () => {
 
     useEffect(() => {
         if (session) { 
-            navigate("/dashboard")
+            navigate("/dashboard");
         }
     }, [session, navigate])
 
