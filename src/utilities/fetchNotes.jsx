@@ -14,6 +14,7 @@ export const fetchNotes = async (session, { single = false } = {}) => {
         .order("created_at", { ascending: false });
 
     if (single) {
+        // Assures that only the first note is shown
         query = query.limit(1).select();
     }
 

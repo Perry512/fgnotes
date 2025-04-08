@@ -41,6 +41,10 @@ export const getCachedPlayer = () => {
     }
 };
 
+export const updateCachedPlayer = (playerData) => {
+    localStorage.setItem(PLAYER_CACHE_KEY, JSON.stringify(playerData));
+} 
+
 export const clearCachedPlayer = () => {
     localStorage.removeItem(PLAYER_CACHE_KEY);
 };
