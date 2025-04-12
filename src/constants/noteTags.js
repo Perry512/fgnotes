@@ -5,5 +5,6 @@ export const NOTE_TAGS = Object.freeze({
     Neutral: "Neutral",
     Spacing: "Spacing",
     Weakness: "Weakness",
-    Mix: "Mix"
+    Mix: "Mix",
+    Player_Specific: "Player Specific",
 })
