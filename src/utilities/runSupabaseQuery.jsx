@@ -6,9 +6,9 @@ export const runSupabaseQuery = async (query, {log = false} = {}) => {
             return { error };
         }
         if (log) console.log("Supabase data: ", data);
-        return data;
+        return { data };
     } catch {
-        console.error("Unexpected Error: ", error);
+        console.error("Unexpected Error: ", err);
         return { error: err.message };
     }
 };

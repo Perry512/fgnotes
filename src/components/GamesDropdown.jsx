@@ -20,7 +20,7 @@ export function GamesDropdown() {
       return;
     }
 
-    const { error } = await supabase
+    const query = await supabase
       .from('Player')
       .update({ games_played: selectedGames })
       .eq('internal_id', session.user.id);

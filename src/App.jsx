@@ -5,15 +5,14 @@ import { UserAuth } from "./context/AuthContext";
 
 function App() {
   const { user } = UserAuth();
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
+  // useEffect(() => {
+  //   if (user !== undefined) {
+  //     setLoading(false);
+  //   }
+  // }, [user]);
 
-  useEffect(() => {
-    if (user !== undefined) {
-      setLoading(false);
-    }
-  }, [user]);
-
-  if (loading) return <p>Loading...</p>;
+  // if (loading) return <p>Loading...</p>;
 
   return <>{user ? <Dashboard /> : <Signup />}</>;
 }

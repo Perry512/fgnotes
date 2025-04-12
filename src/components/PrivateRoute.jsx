@@ -6,7 +6,7 @@ const PrivateRoute = ({ children }) => {
     const { session, loading } = UserAuth();
 
     if (loading) {
-        return <div> Loading, please stand by </div>
+        return <div> Loading, Please stand by </div>
     }
 
     return session ? children : <Navigate to="/signup" />;

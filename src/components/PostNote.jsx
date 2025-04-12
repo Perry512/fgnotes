@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Textarea } from '@headlessui/react';
-import { createNoteService } from '../services/createNoteService';
+import { createNoteService } from '../utilities/noteUtils';
 import { UserAuth } from '../context/AuthContext';
 
 export default function PostNote() {

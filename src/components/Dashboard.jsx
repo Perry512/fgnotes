@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import GetPlayer from "../services/getPlayer";
 import UpdatePlayer from "../services/UpdatePlayerTag";
 import GamesDropdown from "../components/GamesDropdown";
-import PostNote from "./PostNote";
-import DisplayNotesFull from "./DisplayNotesFull";
+import NotesPage from "../pages/NotesPage";
 import SignOut from "./SignOut";
 import WelcomeBanner from "./WelcomeBanner";
 
@@ -15,8 +14,7 @@ const Dashboard = () => {
             <WelcomeBanner />
             <div>
                 <SignOut />
-                <DisplayNotesFull />
-                <PostNote />
+                <NotesPage />
                 <GamesDropdown />
                 <GetPlayer />
                 <UpdatePlayer />

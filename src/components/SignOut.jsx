@@ -7,6 +7,7 @@ const SignOut = () => {
 
     const handleSignOut = async (e) => {
         e.preventDefault();
+        console.log("attempting logout")
 
         try {
             await signOut();

@@ -1,9 +1,13 @@
 import { UserAuth } from "../context/AuthContext";
 
 export default function GetPlayer() {
-    const { player } = UserAuth();
+    const { player, loading } = UserAuth();
 
-    // console.log("Player status: ", player);
+    console.log("Player status: ", player);
+
+    if (loading || !player) {
+        return <p>Loading player data...</p>
+    }
     return (
         <div>
             <h1>Player Profile</h1>
@@ -11,7 +15,7 @@ export default function GetPlayer() {
                 <div className="border p-4">
                     <h2 className="text-lg font-bold">{player.tag}</h2>
                     <p><strong>Games Played:</strong> {player.games_played.join(", ")}</p>
-                    <p><strong>Created At:</strong> {new Date(player.created_at).toLocaleString()}</p>
+                    <p><strong>Created At:</strong> {new Date(player?.created_at).toLocaleString()}</p>
                     <p><strong>Updated At:</strong> {new Date(player.updated_at).toLocaleString()}</p>
                 </div>
             ) : (
