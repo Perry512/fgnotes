@@ -12,27 +12,31 @@ export const useNotes = () => {
         setLoading(true);
         setError(null);
 
-        console.log("Player in loadNotes: ", player);
+        const playerData = player?.data || player;
+        console.log("PlayerData in loadNotes: ", playerData);
 
-        if (!player?.internal_id) {
+
+        if (!playerData.internal_id) {
             setError("Player not available");
             setLoading(false);
             return;
         }
 
-        const { data, error } = await fetchPlayerNotes(player.internal_id);
+        const result = await fetchPlayerNotes(playerData.internal_id);
         
-        if (error) {
+        console.log("Result from fetchPlayerNotes: ", result);
+        if (result.error) {
             setError(error);
         } else {
-            console.log("useNotes data: ", data)
-            setNotes(data || []);
+            console.log("useNotes data: ", result)
+            setNotes(result || []);
         }
 
         setLoading(false);
     }
 
     const deleteNote = async (noteId) => {
+        // I will likely need to change player into playerData if delete isn't working
         setLoading(true);
         setError(null);
 
@@ -53,15 +57,15 @@ export const useNotes = () => {
     }
 
     useEffect(() => {
-        // console.log("Session: ", session);
-        // console.log("Player: ", player);
+        console.log("Session in useEffect: ", session);
+        console.log("Player in useEffect: ", player);
 
-        if (session && player?.internal_id) { loadNotes() };
+        if (session) { loadNotes() };
     }, [session, player]);
 
     useEffect(() => {
         console.log("Notes state updated: ", notes);
-    })
+    }, [notes]);
 
     return { notes, loading, error, deleteNote, reloadNotes: loadNotes   };
 };

@@ -4,8 +4,11 @@ import { runSupabaseQuery } from "./runSupabaseQuery";
 const PLAYER_CACHE_KEY = "cache:player";
 const EXPIRY_MS = 1000 * 60 * 5; // 5 mins
 
-export const fetchAndCachePlayer = async (userId) => {
+export const fetchAndCachePlayer = async (userId, {verbose = false}) => {
 
+    if (verbose) {
+        console.log("Attempting fetchAndCachePlayer");
+    }
     const query = await supabase
         .from('Player')
         .select('*')
@@ -15,7 +18,7 @@ export const fetchAndCachePlayer = async (userId) => {
     const data = await runSupabaseQuery(query);
     if (!data) return null;
 
-    console.log("FetchAndRetrieved");
+    console.log("FetchAndRetrieved: ", data);
     const payload = {
         value: data,
         expiry: Date.now() + EXPIRY_MS,
@@ -25,8 +28,10 @@ export const fetchAndCachePlayer = async (userId) => {
         return data;
 }
 
-export const getCachedPlayer = () => {
-    console.log("Attempting getCachedPlayer");
+export const getCachedPlayer = ( {verbose = false} = {}) => {
+    if (verbose) {
+        console.log("Attempting getCachedPlayer");
+    }
     try {
         const raw = localStorage.getItem(PLAYER_CACHE_KEY);
         if (!raw) return null;
@@ -36,7 +41,9 @@ export const getCachedPlayer = () => {
             clearCachedPlayer();
             return null;
         }
-
+        if (verbose) {
+            console.log("Cached Player: ", value);
+        }
         return value;
     } catch {
         return null;

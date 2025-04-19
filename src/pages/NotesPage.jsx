@@ -5,11 +5,11 @@ import PostNote from "../components/PostNote";
 const NotesPage = () => {
     return (
         <>
-            <DisplayNotesFull />
+            <PostNote />
             <div className="my-9"> 
                 
             </div>
-            <PostNote />
+            <DisplayNotesFull />
         </>
     )
 }

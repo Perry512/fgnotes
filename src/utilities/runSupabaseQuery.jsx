@@ -1,14 +1,14 @@
-export const runSupabaseQuery = async (query, {log = false} = {}) => {
+export const runSupabaseQuery = async (query, {verbose = true} = {}) => {
     try {
         const { data, error } = await query;
         if (error) {
             console.error("Supabase error: ", error);
-            return { error };
+            return error;
         }
-        if (log) console.log("Supabase data: ", data);
-        return { data };
-    } catch {
+        if (verbose) console.log("Supabase data: ", data);
+        return {data, error: null};
+    } catch (err){
         console.error("Unexpected Error: ", err);
-        return { error: err.message };
+        return { data:null, error: err.message || "Unknown error D:" };
     }
 };

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { UserAuth } from "../context/AuthContext";
 import { supabase } from "../supabaseClient";
+import { runSupabaseQuery } from "../utilities/runSupabaseQuery";
 
 export const UpdatePlayerTag = () => {
     
@@ -11,15 +12,22 @@ export const UpdatePlayerTag = () => {
     const { session } = UserAuth();
 
     const handleUpdatePlayer = async(e) => {
+        if (tag === null || tag === '') {
+            setError("Please enter a tag");
+            return;
+        }
+        
         e.preventDefault();
         setLoading(true);
+ 
 
-
-        const { data: Player, error } = await supabase
+        const query = await supabase
             .from('Player')
             .update({ tag: tag })
             .eq('internal_id', session?.user?.id)
 
+
+        runSupabaseQuery(query, {verbose: true});
         if (error) {
             setError(error);
             setTag(null);

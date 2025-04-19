@@ -3,6 +3,8 @@ import { useNotes } from "../hooks/useNotes";
 export default function DisplayNotesFull() {
     const { notes, loading, deleteNote, error } = useNotes();
 
+    console.log("Notes: ", notes)
+
     return (
         <div className="border my-2 space-y">
             {loading && <p>Loading...</p>}

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -25,14 +27,16 @@ a:hover {
 }
 
 body {
-  margin: 0;
-  display: flex;
+  /* display: flex;
   place-items: center;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
+  margin: 10px;
   min-width: 320px;
   min-height: 100vh;
   height: 100%;
+  width: 100%;
+
 }
 
 h1 {

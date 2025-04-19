@@ -9,7 +9,7 @@ export function GamesDropdown() {
   const [selectedGames, setSelectedGames] = useState([]);
 
   useEffect(() => {
-    if (player?.games_played) {
+    if (player.games_played) {
       setSelectedGames(player.games_played);
     }
   }, [player?.games_played]);
