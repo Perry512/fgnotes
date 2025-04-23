@@ -54,6 +54,10 @@ export const AuthContextProvider = ({ children }) => {
     return { success: true };
   };
 
+  const setLoadingState = (state) => {
+    setLoading(state);
+  };
+
   useEffect(() => {
     console.log("AuthContextProvider mounted");
     let mounted = true;
@@ -71,7 +75,9 @@ export const AuthContextProvider = ({ children }) => {
         const cachedPlayer = getCachedPlayer();
 
         console.log("Cached Player: ", cachedPlayer);
-        if (cachedPlayer) {
+        if (!cachedPlayer || cachedPlayer === null) {
+          console.log("No cached player found");
+        } else {
           setPlayer(cachedPlayer);
           hasFetchedPlayer.current = true;
           setLoading(false);

@@ -3,8 +3,7 @@ import { getCachedPlayer } from "../utilities/playerUtils";
 import { UserAuth } from "../context/AuthContext";
 
 const WelcomeBanner = () => {
-    const { session } = UserAuth();
-    const player = getCachedPlayer();
+    const { session, player } = UserAuth();
     const playerData = player?.data || player;
 
     return (

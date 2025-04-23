@@ -12,17 +12,13 @@ export const useNotes = () => {
         setLoading(true);
         setError(null);
 
-        const playerData = player?.data || player;
-        console.log("PlayerData in loadNotes: ", playerData);
-
-
-        if (!playerData.internal_id) {
+        if (!player.internal_id) {
             setError("Player not available");
             setLoading(false);
             return;
         }
 
-        const result = await fetchPlayerNotes(playerData.internal_id);
+        const result = await fetchPlayerNotes(player.internal_id);
         
         console.log("Result from fetchPlayerNotes: ", result);
         if (result.error) {
@@ -36,7 +32,7 @@ export const useNotes = () => {
     }
 
     const deleteNote = async (noteId) => {
-        // I will likely need to change player into playerData if delete isn't working
+        // I will likely need to change player into player if delete isn't working
         setLoading(true);
         setError(null);
 

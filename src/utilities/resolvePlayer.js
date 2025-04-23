@@ -24,16 +24,11 @@ const extractUserId = async (input, {verbose=true} = {}) => {
         if (verbose) console.log("input eq session.user.id: ", input.session.user.id);
         userId =  input.session.user.id;
     }
-    // if (input?.sub) {
-    //     if (verbose) console.log("input eq sub: ", input.sub);
-    //     userId = input.sub;
-    // }
     if (userId) {
         console.log("Returning Player: ", input);
         return userId;
     }
     
-
     const query = supabase
     .from("Player")
     .select("*")

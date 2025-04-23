@@ -5,9 +5,11 @@ import { GAMES } from "../constants/games";
 import { MultiSelectDropdown } from "./MultiSelectDropdown";
 
 export function GamesDropdown() {
-  const { session, player } = UserAuth();
+  const { session, player, loading } = UserAuth();
   const [selectedGames, setSelectedGames] = useState([]);
 
+  console.log("Player status GamesDropdown: ", player);
+  
   useEffect(() => {
     if (player.games_played) {
       setSelectedGames(player.games_played);
@@ -16,11 +18,11 @@ export function GamesDropdown() {
 
   const handleSave = async () => {
     if (!session?.user?.id) {
-      console.error("No user session found.");
+      console.error("GamesDropdown: No user session found.");
       return;
     }
 
-    const query = await supabase
+    const { error } = await supabase
       .from('Player')
       .update({ games_played: selectedGames })
       .eq('internal_id', session.user.id);
@@ -30,6 +32,11 @@ export function GamesDropdown() {
     } else {
       console.log("Games played updated successfully");
     }
+
+    if (!loading && !player) {
+      return <p>Loading player data...</p>;
+    }
+
   };
 
   return (

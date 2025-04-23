@@ -14,7 +14,7 @@ export const fetchAndCachePlayer = async (userId, {verbose = false}) => {
         .select('*')
         .eq('internal_id', userId)
         .single()
-        
+
     const data = await runSupabaseQuery(query);
     if (!data) return null;
 
@@ -28,24 +28,33 @@ export const fetchAndCachePlayer = async (userId, {verbose = false}) => {
         return data;
 }
 
-export const getCachedPlayer = ( {verbose = false} = {}) => {
+export const getCachedPlayer = ( {verbose = false} = {} ) => {
     if (verbose) {
         console.log("Attempting getCachedPlayer");
     }
+    
     try {
         const raw = localStorage.getItem(PLAYER_CACHE_KEY);
-        if (!raw) return null;
-
+        console.log("Raw: ", raw);
+        if (!raw || raw === null)  {
+            console.log("No cached player found, returning null.");
+            return null;
+            
+        }
+        
         const { value, expiry } = JSON.parse(raw);
         if (Date.now() > expiry) {
+            console.log("Cached player expired.");
             clearCachedPlayer();
             return null;
         }
         if (verbose) {
             console.log("Cached Player: ", value);
         }
-        return value;
-    } catch {
+        return value.data;
+    } catch (error) {
+        console.error("Error retrieving cached player: ", error);
+        clearCachedPlayer();
         return null;
     }
 };
