@@ -3,15 +3,21 @@ import { supabase } from "../supabaseClient";
 import { UserAuth } from "../context/AuthContext";
 import { GAMES } from "../constants/games";
 import { MultiSelectDropdown } from "./MultiSelectDropdown";
+import { usePlayer } from "../hooks/usePlayer";
+import { updatePlayerGamesPlayed } from "../utilities/updatePlayerGamesPlayed";
+import { Spinner } from "flowbite-react";
 
 export function GamesDropdown() {
-  const { session, player, loading } = UserAuth();
+  const { session, loading: sessionLoading } = UserAuth();
+  const { player, loading: playerLoading, error: playerError } = usePlayer(session, {useData: true});
   const [selectedGames, setSelectedGames] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   console.log("Player status GamesDropdown: ", player);
   
   useEffect(() => {
-    if (player.games_played) {
+    if (player?.games_played) {
       setSelectedGames(player.games_played);
     }
   }, [player?.games_played]);
@@ -19,24 +25,26 @@ export function GamesDropdown() {
   const handleSave = async () => {
     if (!session?.user?.id) {
       console.error("GamesDropdown: No user session found.");
+      setLoading(false);
       return;
     }
 
-    const { error } = await supabase
-      .from('Player')
-      .update({ games_played: selectedGames })
-      .eq('internal_id', session.user.id);
+    const { error } = await updatePlayerGamesPlayed(player?.internal_id, selectedGames);
 
     if (error) {
       console.error("Error updating games played:", error);
+      setError(error);
     } else {
       console.log("Games played updated successfully");
     }
 
-    if (!loading && !player) {
-      return <p>Loading player data...</p>;
+    if (!loading || !player || playerLoading) {
+      return <Spinner />;
     }
 
+    if (error || playerError) {
+      return <p className="text-red-500">{error?.message || playerError?.message}</p>;
+    }
   };
 
   return (

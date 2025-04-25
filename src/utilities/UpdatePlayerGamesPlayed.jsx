@@ -1,20 +1,32 @@
 import { supabase } from "../supabaseClient";
+import { runSupabaseQuery } from "./runSupabaseQuery";
 
-export const UpdatePlayerGamesPlayed = async (gamesPlayed, session) => {
+export const updatePlayerGamesPlayed = async (userId, gamesPlayed) => {
     
-    if (!session?.user?.id) {
-        console.error("No user session found.");
-        return;
+    if (!userId) {
+        console.error("updatePlayerGamesPlayedNo user session found.");
+        return { error: "No user session found." };
     }
 
-    const { error } = await supabase
+    const query = await supabase
         .from('Player')
         .upsert({ games_played: gamesPlayed })
         .eq('internal_id', session.user.id);
 
-    if (error) {
-        console.error("Error updating games played:", error);
-    } else {
-        console.log("Games played updated successfully");
-    }
+    runSupabaseQuery(query, { verbose: true })
+        .then((data) => {
+            if (data) {
+                console.log("Games played updated successfully", data);
+                return { success: true, data };
+            } else {
+                console.error("Error updating games played:", error);
+                return { error };
+            }
+        })
+        .catch((error) => {
+            console.error("Error updating games played:", error);
+            return { error };
+        });
+    return { error };
+    
 };

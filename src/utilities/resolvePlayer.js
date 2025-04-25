@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { fetchAndCachePlayer, getCachedPlayer } from "./playerUtils";
 import { supabase } from "../supabaseClient";
 import { runSupabaseQuery } from "./runSupabaseQuery";
 
 let debounceTimer;
+const access_token = localStorage.getItem("access_token");
 
 const extractUserId = async (input, {verbose=true} = {}) => {
     let userId;
@@ -28,6 +30,7 @@ const extractUserId = async (input, {verbose=true} = {}) => {
         console.log("Returning Player: ", input);
         return userId;
     }
+
     
     const query = supabase
     .from("Player")
@@ -40,31 +43,37 @@ const extractUserId = async (input, {verbose=true} = {}) => {
 
 export const resolvePlayer = async (
     sessionOrUserId,
-    options = { debounce: false, delay: 250, verbose: false }
+    options = { debounce: false, delay: 250, verbose: true }
 ) => {
     
-    console.log("resolvePlayer: Session/UserId: ", sessionOrUserId );
+    if (options.verbose) console.log("resolvePlayer: Session/UserId: ", sessionOrUserId );
     const userId = await extractUserId(sessionOrUserId);
 
     if (!userId) {
-        console.error("resolvePlayer: No valid userId", userId);
-        return null;
+         if (options.verbose) console.error("resolvePlayer: No valid userId", userId);
+        return { player: null, status: "error"};
     }
 
     const cached = getCachedPlayer( {verbose: true} );
     
     if (cached?.internal_id === userId) {
-        console.log("resolvePlayer: Found cached player: ", cached);
-        return cached;
+        if (options.verbose) console.log("resolvePlayer: Found cached player: ", cached);
+        if (access_token) {
+            if (options.verbose) {
+                console.log("resolvePlayer: Found access token, start running fetchandcache: ", cached);
+                return { player: cached, status: "stale_cache_with_token" };
+            }
+        return { player: cached, status: "cached" };
+        }
     }
-
+    //TODO: The above should have a check for is the auth token or the cache:player
     if (options.debounce) { 
         return new Promise((resolve) => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(async () => {
                 console.log("fetchingAndCaching player: ", userId);
                 const fetched = await fetchAndCachePlayer(userId , {verbose: true });
-                resolve(fetched || null);
+                resolve({ player: fetched || null, status: fetched ? "fetched" : "error" });
             }, options.delay || 250);
         });
     }

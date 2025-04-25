@@ -37,7 +37,9 @@ export const usePlayer = (sessionOrUserId, {useData = false} = {}) => {
 
         fetchPlayer();
 
-    }, [sessionOrUserId]);
+        console.log("usePlayer: Error: ", error);
+
+    }, [sessionOrUserId, error, loading]);
 
     return {
         player: useData ? player?.data : player,

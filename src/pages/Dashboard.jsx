@@ -3,19 +3,29 @@ import NotesPage from "./NotesPage";
 import SignOut from "../components/SignOut";
 import WelcomeBanner from "../components/WelcomeBanner";
 import PlayerPage from "./PlayerPage";
-import Header from "../components/Header";
 import DashboardLayout from "./DashboardLayout";
 
 const Dashboard = () => {
+    const [activePage, setActivePage] = useState("notes");
+
+    const renderPage = () => {
+        switch (activePage) {
+            case "notes":
+                return <NotesPage />;
+            case "player":
+                return <PlayerPage />;
+            default:
+                return <NotesPage />;
+        }
+    };
 
     return (
-        <DashboardLayout>
+        <DashboardLayout setActivePage={setActivePage}>
         <div className="flex flex-col justify-items-center my-4 w-full"> 
             <h1> Dashboard </h1>
             <WelcomeBanner />
             <div>
-                <NotesPage />
-                <PlayerPage />
+                {renderPage()}
                 <SignOut />
             </div>
         </div>

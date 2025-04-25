@@ -1,25 +1,38 @@
 import { useEffect, useState }  from "react";
 import { UserAuth } from "../context/AuthContext";
 import { deleteNoteService, fetchPlayerNotes } from "../utilities/noteUtils";
+import { usePlayer } from "./usePlayer";
 
 export const useNotes = () => {
-    const { session, player } = UserAuth();
+    const { session } = UserAuth();
+    const { player, loading: usePlayerLoading, error: usePlayerError } = usePlayer(session);
     const [notes, setNotes] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const loadNotes = async () => {
         setLoading(true);
         setError(null);
 
-        if (!player.internal_id) {
-            setError("Player not available");
+        if (usePlayerLoading) {
+            console.log("useNotes: Player is loading, returning early.");
             setLoading(false);
             return;
         }
 
+        if (player === null || player === undefined) {
+            setError("Player not available");
+            setLoading(false);
+            usePlayerError("Player not available from loadNotes");
+            return;
+        }
+
+        if (!player.internal_id) {
+            setError("Player internal_id not available");
+            setLoading(false);
+            return;
+        }
         const result = await fetchPlayerNotes(player.internal_id);
-        
         console.log("Result from fetchPlayerNotes: ", result);
         if (result.error) {
             setError(error);
@@ -56,12 +69,12 @@ export const useNotes = () => {
         console.log("Session in useEffect: ", session);
         console.log("Player in useEffect: ", player);
 
-        if (session) { loadNotes() };
+        if (session && player && !usePlayerLoading) { loadNotes() };
     }, [session, player]);
 
     useEffect(() => {
         console.log("Notes state updated: ", notes);
     }, [notes]);
 
-    return { notes, loading, error, deleteNote, reloadNotes: loadNotes   };
+    return { notes, loading, error, deleteNote, reloadNotes: loadNotes };
 };

@@ -6,18 +6,22 @@ import {
   clearCachedPlayer,
   updateCachedPlayer,
 } from "../utilities/playerUtils";
-import { resolvePlayer } from "../utilities/resolvePlayer";
+import { useResolvePlayer } from "../hooks/useResolvePlayer";
+import { Spinner } from "flowbite-react";
 
 const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [status, setStatus] = useState("loading");
   const [session, setSession] = useState(null);
   const [player, setPlayer] = useState(null);
   const [notes, setNotes] = useState([]);
   const hasFetchedPlayer = useRef(false);
 
   const createPlayer = async (userId) => {
+    setLoading(true);
     await supabase
       .from("Player")
       .insert([{ internal_id: userId }])
@@ -27,35 +31,41 @@ export const AuthContextProvider = ({ children }) => {
 
   const signUpNewUser = async (email, password) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) return { success: false, error };
+    if (error) {
+      setLoading(false);
+      return { success: false, error };
+    }
 
     const userId = data.user?.id;
     if (userId) await createPlayer(userId);
-
+    setLoading(false);
     return data;
   };
 
   const signInUser = async (email, password) => {
+    setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    if (error) return { success: false, error: error.message };
-    return data;
+    if (error) {
+      setLoading(false);
+      return { success: false, error: error.message };
+    }
+    setLoading(false)
+      return data;
   };
 
   const signOut = async () => {
+    setLoading(true);
     await supabase.auth.signOut();
+    setLoading(false);
     setSession(null);
     setPlayer(null);
     setNotes([]);
     clearCachedPlayer();
     hasFetchedPlayer.current = false;
     return { success: true };
-  };
-
-  const setLoadingState = (state) => {
-    setLoading(state);
   };
 
   useEffect(() => {
@@ -67,68 +77,15 @@ export const AuthContextProvider = ({ children }) => {
       if (!mounted) return;
 
       const currentSession = data.session;
-      setSession(data.session);
-
-      console.log("Attempting to pass SetSession: ");
-      if (currentSession?.user?.id && !hasFetchedPlayer.current) {
-        console.log("Session found: ", currentSession);
-        const cachedPlayer = getCachedPlayer();
-
-        console.log("Cached Player: ", cachedPlayer);
-        if (!cachedPlayer || cachedPlayer === null) {
-          console.log("No cached player found");
-        } else {
-          setPlayer(cachedPlayer);
-          hasFetchedPlayer.current = true;
-          setLoading(false);
-          console.log("Returning, found cached player: ", cachedPlayer);
-          return;
-        }
-        
-        console.log("Somehow got past the cached player check: ", currentSession.user.id);
-        let resolved = await resolvePlayer(currentSession.user.id, { debounce: true });
-
-        if (!resolved) {
-          await createPlayer(currentSession.user.id);
-          resolved = await resolvePlayer(currentSession.user.id, { debounce: true });
-        } 
-
-        console.log("Resolve: ", resolved);
-        if (resolved && typeof resolved.then !== "function") {
-          setPlayer(resolved);
-          updateCachedPlayer(resolved);
-        } else {
-          console.error("Failed to resolve player data, ", typeof(resolved));
-          setPlayer(null);
-          clearCachedPlayer();
-        }
-        
-        hasFetchedPlayer.current = true;
-      }
-
-      setLoading(false);
-    };
+      setSession(currentSession);
+    }
 
     initAuth();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
         if (!mounted) return;
-
         setSession(newSession);
-
-        if (newSession?.user?.id) {
-          const resolved = await resolvePlayer(newSession.user.id);
-          if (resolved?.data) {
-            setPlayer(resolved);
-            updateCachedPlayer(resolved);
-          }
-        } else {
-          setPlayer(null);
-          clearCachedPlayer();
-        }
-        hasFetchedPlayer.current = true;
-        setLoading(false);
       }
     );
 
@@ -137,6 +94,16 @@ export const AuthContextProvider = ({ children }) => {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  useResolvePlayer({
+    userId: session?.user?.id,
+    accessToken: session?.access_token,
+    setPlayer,
+    setStatus,
+    setLoading,
+    hasFetchedPlayer
+  });
+
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -198,7 +165,8 @@ export const AuthContextProvider = ({ children }) => {
         }
       )
       .subscribe();
-      setLoading(false);
+
+    setLoading(false);
 
     return () => {
       playerSub.unsubscribe();
@@ -206,7 +174,7 @@ export const AuthContextProvider = ({ children }) => {
     };
   }, [session?.user?.id]);
 
-  if (loading) return <div>Loading, please stand by</div>;
+  if (loading) return <Spinner />;
 
   return (
     <AuthContext.Provider

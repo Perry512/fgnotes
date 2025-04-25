@@ -3,7 +3,7 @@ import { Badge, Sidebar, SidebarCTA, SidebarItem, SidebarItemGroup, SidebarItems
 import { HiArrowSmRight, HiChartPie, HiInbox, HiShoppingBag, HiTable, HiUser, HiViewBoards } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 
-export function AppSidebar({ open }) {  
+export function AppSidebar({ open, setOpen, setActivePage }) {  
     if(!open) return null;
     const navigate = useNavigate();
 
@@ -13,11 +13,15 @@ export function AppSidebar({ open }) {
                 <SidebarItemGroup>
                     <SidebarItem 
                         icon={HiChartPie}
-                        onClick={() => navigate('/notes')}>
-                        Dashboard
+                        onClick={() => {setActivePage("notes")}}
+                    >
+                        Notes
                     </SidebarItem>
-                    <SidebarItem icon={HiViewBoards}>
-                        Boards
+                    <SidebarItem 
+                        icon={HiViewBoards}
+                        onClick={() => {setActivePage("player")}}
+                    >
+                        Player Info
                     </SidebarItem>
                 </SidebarItemGroup>
             </SidebarItems>

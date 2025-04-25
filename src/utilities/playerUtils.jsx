@@ -48,6 +48,17 @@ export const getCachedPlayer = ( {verbose = false} = {} ) => {
             clearCachedPlayer();
             return null;
         }
+
+        if  (value &&
+            typeof value === "object" &&
+            "code" in value &&
+            "message" in value &&
+            !("data" in value)
+        ) { 
+            console.log("Cached player is invalid, clearing cache.");
+            clearCachedPlayer();
+            return null;
+        }
         if (verbose) {
             console.log("Cached Player: ", value);
         }
