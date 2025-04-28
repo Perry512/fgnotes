@@ -11,7 +11,7 @@ export const updatePlayerGamesPlayed = async (userId, gamesPlayed) => {
     const query = await supabase
         .from('Player')
         .upsert({ games_played: gamesPlayed })
-        .eq('internal_id', session.user.id);
+        .eq('internal_id', userId);
 
     runSupabaseQuery(query, { verbose: true })
         .then((data) => {

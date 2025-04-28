@@ -7,7 +7,6 @@ import {
   updateCachedPlayer,
 } from "../utilities/playerUtils";
 import { useResolvePlayer } from "../hooks/useResolvePlayer";
-import { Spinner } from "flowbite-react";
 
 const AuthContext = createContext();
 
@@ -19,6 +18,13 @@ export const AuthContextProvider = ({ children }) => {
   const [player, setPlayer] = useState(null);
   const [notes, setNotes] = useState([]);
   const hasFetchedPlayer = useRef(false);
+
+  useResolvePlayer({
+    userId: session?.user?.id,
+    accessToken: session?.access_token,
+    setPlayer,
+    setStatus,
+  });
 
   const createPlayer = async (userId) => {
     setLoading(true);
@@ -76,8 +82,9 @@ export const AuthContextProvider = ({ children }) => {
       const { data } = await supabase.auth.getSession();
       if (!mounted) return;
 
-      const currentSession = data.session;
-      setSession(currentSession);
+      console.log("AuthContextProvider: initAuth: ", data);
+      setSession(data.session ?? null);
+      setLoading(false);
     }
 
     initAuth();
@@ -91,19 +98,9 @@ export const AuthContextProvider = ({ children }) => {
 
     return () => {
       mounted = false;
-      authListener.subscription.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
-
-  useResolvePlayer({
-    userId: session?.user?.id,
-    accessToken: session?.access_token,
-    setPlayer,
-    setStatus,
-    setLoading,
-    hasFetchedPlayer
-  });
-
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -132,6 +129,7 @@ export const AuthContextProvider = ({ children }) => {
           filter: `internal_id=eq.${session.user.id}`,
         },
         (payload) => {
+          console.log("Player created: ", payload.new);
           updateCachedPlayer(payload.new);
           setPlayer(payload.new);
         }
@@ -174,8 +172,6 @@ export const AuthContextProvider = ({ children }) => {
     };
   }, [session?.user?.id]);
 
-  if (loading) return <Spinner />;
-
   return (
     <AuthContext.Provider
       value={{
@@ -186,6 +182,8 @@ export const AuthContextProvider = ({ children }) => {
         player,
         setPlayer,
         loading,
+        error,
+        setError,
       }}>
       {children}
     </AuthContext.Provider>

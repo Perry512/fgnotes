@@ -5,7 +5,7 @@ import { usePlayer } from "./usePlayer";
 
 export const useNotes = () => {
     const { session } = UserAuth();
-    const { player, loading: usePlayerLoading, error: usePlayerError } = usePlayer(session);
+    const { player, loading: usePlayerLoading, error: usePlayerError } = usePlayer(session, {useData: true});
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -21,12 +21,19 @@ export const useNotes = () => {
         }
 
         if (player === null || player === undefined) {
-            setError("Player not available");
+            setError("Player is null or undefined in useNotes.loadNotes");
             setLoading(false);
-            usePlayerError("Player not available from loadNotes");
+            usePlayerError("Player is null or undefined in useNotes.loadNotes");
             return;
         }
 
+        if (error || usePlayerError) {
+            console.log("useNotes: Error in usePlayer: ", error || usePlayerError);
+            setLoading(false);
+            return;
+        }
+        
+        console.log("Player in useNotes: ", player);
         if (!player.internal_id) {
             setError("Player internal_id not available");
             setLoading(false);
@@ -59,9 +66,7 @@ export const useNotes = () => {
         if (error) {
             setError(error);
         }
-        //  else {
-        //     await loadNotes();
-        // }
+
         setLoading(false);
     }
 

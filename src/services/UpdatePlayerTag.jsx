@@ -1,57 +1,67 @@
 import React, { useState } from "react";
 import { UserAuth } from "../context/AuthContext";
-import { supabase } from "../supabaseClient";
-import { runSupabaseQuery } from "../utilities/runSupabaseQuery";
+import { updateCachedPlayer, updatePlayerField } from "../utilities/playerUtils";
 
 export const UpdatePlayerTag = () => {
     
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState('');
+    const [loading, setLoading] = useState(false);
     const [tag, setTag] = useState(null);
     
-    const { session } = UserAuth();
+    const { session, player, setPlayer } = UserAuth();
 
     const handleUpdatePlayer = async(e) => {
-        if (tag === null || tag === '') {
+        e.preventDefault();
+
+        if (!tag.trim()) {
             setError("Please enter a tag");
             return;
         }
-        
-        e.preventDefault();
+
         setLoading(true);
- 
+        setError("");
 
-        const query = await supabase
-            .from('Player')
-            .update({ tag: tag })
-            .eq('internal_id', session?.user?.id)
+        const { data, error: updateError } = await updatePlayerField(
+            session?.user?.id,
+            "tag",
+            tag.trim(),
+            { verbose: true }
+        );
 
-
-        runSupabaseQuery(query, {verbose: true});
-        if (error) {
-            setError(error);
-            setTag(null);
+        if (updateError) {
+            setError(updateError.message || "Failed to update player tag");
             setTimeout(() => {
                 setError("");
             }, 3000)
 
-        } else {
-            setTag(tag);
-
+        } else if (data) {
+            setPlayer(data);
+            updateCachedPlayer(data, { verbose: true });
+            setTag("");
         }
 
         setLoading(false);
-        console.log(Player, loading);
+        console.log(player, loading);
         
     }
 
     return (
         <>
-            <form>
+            <form onSubmit={handleUpdatePlayer} className="flex flex-col">
                 <h1> Update Player </h1>
-                <input onChange={(e) => setTag(e.target.value)} placeholder="Your tag goes here" className="p-3 mt-2" type="tag"/>
-                <button className="mt-6 w-full" type="submit" onClick={handleUpdatePlayer}> Update Player </button>
-                {error && <p className="text-red-600 text center pt-4"> {error} </p>}
+                <input 
+                    onChange={(e) => setTag(e.target.value)} 
+                    placeholder="Your tag goes here" 
+                    className="p-3 mt-2" 
+                    type="text"
+                />
+                <button 
+                    className="mt-6 w-full" 
+                    type="submit" 
+                > 
+                    { loading ? "Updating" : "Update Player" }
+                </button>
+                {error && <p className="text-red-600 text-center pt-4"> {error} </p>}
             </form>
         </>
     )

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
 import { UserAuth } from "../context/AuthContext";
 import { GAMES } from "../constants/games";
 import { MultiSelectDropdown } from "./MultiSelectDropdown";
@@ -8,8 +7,8 @@ import { updatePlayerGamesPlayed } from "../utilities/updatePlayerGamesPlayed";
 import { Spinner } from "flowbite-react";
 
 export function GamesDropdown() {
-  const { session, loading: sessionLoading } = UserAuth();
-  const { player, loading: playerLoading, error: playerError } = usePlayer(session, {useData: true});
+  const { session, loading: sessionLoading, player } = UserAuth();
+  const { loading: playerLoading, error: playerError } = usePlayer(session, {useData: true});
   const [selectedGames, setSelectedGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
