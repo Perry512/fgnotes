@@ -2,7 +2,7 @@ import { cache } from "react";
 import { supabase } from "../supabaseClient";
 import { runSupabaseQuery } from "./runSupabaseQuery";
 
-const PLAYER_CACHE_KEY = "cache:player";
+const PLAYER_CACHE_KEY = "cached:player";
 const EXPIRY_MS = 1000 * 60 * 5; // 5 mins
 
 const buildCachePayload = (data) => ({
@@ -12,11 +12,16 @@ const buildCachePayload = (data) => ({
 });
 
 export const fetchAndCachePlayer = async (userId, options = {}) => {
-    const { verbose = true, useData = true } = options;
-    
-    if (verbose) { console.log("playerUtils: Attempting fetchAndCachePlayer: ", userId); }
+    const { verbose = true} = options;
+
+    if (!userId || typeof userId !== "string") {
+        if (verbose) console.error("fetchAndCachePlayer: Invalid userId", userId);
+        return null;
+    }
 
     const id  = typeof userId === "object" && userId?.user?.id ? userId.user.id : userId;
+    
+    if (verbose) { console.log("playerUtils: Attempting fetchAndCachePlayer: ", userId, id); }
 
     const query = supabase
         .from('Player')
@@ -65,8 +70,8 @@ export const updateCachedPlayer = (playerData, options = {}) => {
     cachePlayer(playerData, options);
 }
 
-export const getCachedPlayer = ( options = {}) => {
-    const { verbose = false } = options;
+export const getCachedPlayer = ( options = {} ) => {
+    const { verbose = true } = options;
 
     if (verbose) { console.log("playerUtils: Attempting getCachedPlayer"); }
     
@@ -74,7 +79,7 @@ export const getCachedPlayer = ( options = {}) => {
         const raw = localStorage.getItem(PLAYER_CACHE_KEY);
         console.log("playerUtils: Raw: ", raw);
         if (!raw || raw === null)  {
-            console.log("playerUtils: No cached player found");
+            if (verbose) console.log("playerUtils: No cached player found");
             return null;
             
         }

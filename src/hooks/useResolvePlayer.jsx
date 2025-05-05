@@ -14,17 +14,12 @@ export const useResolvePlayer = ({ userId, accessToken, setPlayer, setStatus }) 
 
             const cached = getCachedPlayer({ verbose: true });
 
-            if (cached?.code || typeof cached !== "object" || !cached.internal_id) {
-                console.warn("useResolvePlayer: Corrupt or invalid cached player: ", cached);
-                clearCachedPlayer({ verbose: true });
-                setStatus("error");
-                return;
-            }
+            const isValidCached = cached && typeof cached === "object" && !cached.code && cached.internal_id;
 
-            if (cached && cached?.internal_id === userId) {
+            if (isValidCached && cached.internal_id === userId) {
                 setPlayer(cached);
-                setStatus(accessToken ? "stale_cache_with_token" : "cached");
-                
+                setStatus(accessToken ?  "stale_cache_with_token" : "cached");
+
                 if (accessToken) {
                     const fresh = await fetchAndCachePlayer(userId, { verbose: true });
                     if (fresh) {
@@ -37,9 +32,15 @@ export const useResolvePlayer = ({ userId, accessToken, setPlayer, setStatus }) 
                 return;
             }
 
+            if (!isValidCached) { 
+                console.warn("useResolvePlayer: No valid cached player, attempting to fetch player");
+                clearCachedPlayer({ verbose: true });
+            }
+
             let resolved = await resolvePlayer(userId, { verbose: true });
+
             if (!resolved) {
-        
+                
                 setStatus("error");
                 return;
             }

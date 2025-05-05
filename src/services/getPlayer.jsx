@@ -1,12 +1,12 @@
 import { Spinner } from "flowbite-react";
 import { UserAuth } from "../context/AuthContext";
 
-export default function GetPlayer() {
+export default function getPlayer() {
     const { session, player, loading, error } = UserAuth();
-    console.log("Session in GetPlayer: ", session.user.id);
+    console.log("Session in getPlayer: ", session.user.id);
     console.log("Player status: ", player, "\nLoading status: ", loading, "\nError status: ", error);
     
-    if ( loading || !player || player.loading) {
+    if ( loading || !player ) {
         return <><p>Loading player data...</p><Spinner /></>
     }
 

@@ -4,30 +4,7 @@ let debounceTimer = null;
 
 const access_token = localStorage.getItem("access_token");
 
-const extractUserId = async (input, {verbose=true} = {}) => {
-    //let userId;
-
-    // console.log("extractUserId: ", typeof(input));
-    // if (input?.session) {
-    //     if (verbose) console.log("input has session key: "); 
-    //     userId = extractUserId(input.session);
-    // }
-    // if (typeof input === "string") {
-    //     if (verbose) console.log("input eq string: ", input);
-    //     userId = input;
-    // }
-    // if (input?.user?.id) {
-    //     if (verbose) console.log("input eq user.id: ", input.user.id);
-    //     userId = input.user.id;
-    // }
-    // if (input?.session?.user?.id) {
-    //     if (verbose) console.log("input eq session.user.id: ", input.session.user.id);
-    //     userId =  input.session.user.id;
-    // }
-    // if (userId) {
-    //     console.log("Returning Player: ", input);
-    //     return userId;
-    // }
+const extractUserId = (input, {verbose=true} = {}) => { 
     if (!input) return null;
 
     if (typeof input === "string") return input;
@@ -44,10 +21,10 @@ export const resolvePlayer = async (
 
     const { debounce, delay, verbose } = options;
     const userId = extractUserId(sessionOrUserId, {verbose: true});
-    if (options.verbose) console.log("resolvePlayer: Session/UserId: ", sessionOrUserId );
+    if (verbose) console.log("resolvePlayer: Session/UserId: ", sessionOrUserId );
 
     if (!userId) {
-         if (options.verbose) console.error("resolvePlayer: No valid userId", userId);
+         if (verbose) console.error("resolvePlayer: No valid userId", userId);
         return { player: null, status: "error"};
     }
 
