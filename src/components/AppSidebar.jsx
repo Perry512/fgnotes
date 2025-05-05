@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { Badge, Sidebar, SidebarCTA, SidebarItem, SidebarItemGroup, SidebarItems } from "flowbite-react";
 import { HiArrowSmRight, HiChartPie, HiInbox, HiShoppingBag, HiTable, HiUser, HiViewBoards } from "react-icons/hi";
-import { useNavigate } from "react-router-dom";
 
 export function AppSidebar({ open, setOpen, setActivePage }) {  
     if(!open) return null;
-    const navigate = useNavigate();
 
     return (
         <Sidebar aria-label="Sidebar" className="w-64 h-screen flex flex-row-reverse" >
