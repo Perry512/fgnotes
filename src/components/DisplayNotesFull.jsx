@@ -1,9 +1,6 @@
-import { useNotes } from "../hooks/useNotes";
 import { Spinner } from "flowbite-react";
 
-export default function DisplayNotesFull() {
-    const { notes, loading, deleteNote, error } = useNotes();
-
+export default function DisplayNotesFull({notes, loading, deleteNote, error}) {
     console.log("Notes: ", notes);
 
     return (

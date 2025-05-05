@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { createNoteService } from '../utilities/noteUtils';
+import { clearCachedNotes, createNoteService } from '../utilities/noteUtils';
 import { UserAuth } from '../context/AuthContext';
 
-export default function PostNote() {
+export default function PostNote({ reloadNotes }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
-  const { session } = UserAuth();
+  const { session, player } = UserAuth();
 
   const handleCreateNote = async(e) => {
     e.preventDefault();
@@ -16,15 +16,23 @@ export default function PostNote() {
     setError('');
 
     try {
-      const result = await createNoteService(session, title, content, {verbose: true});
+      const result = await createNoteService(session?.user?.id, title, content, { verbose: true });
 
       if (result.success) {
+        setTitle("");
+        setContent("");
+        console.log("PostNotes: reloadNotes: ", reloadNotes);
+        clearCachedNotes();
+        await new Promise((r) => setTimeout(r, 300));
+        await reloadNotes();
+        console.log("PostNote: finished reload notes");
         return { success: true } 
       } else { 
         setError(result.error || "An error has occured creating note");
       }
     } catch (err) {
-      setError("An error has occured", err);
+      setError("An error has occured");
+      console.error("PostNote: An error has occurred while creating note, ", err);
     } finally {
       setLoading(false);
     }
