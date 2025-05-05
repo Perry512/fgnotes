@@ -1,85 +1,67 @@
 import { useEffect, useState }  from "react";
-import { UserAuth } from "../context/AuthContext";
-import { deleteNoteService, fetchPlayerNotes } from "../utilities/noteUtils";
-import { usePlayer } from "./usePlayer";
+import { deleteNoteService, fetchPlayerNotes, getCachedPlayerNotes } from "../utilities/noteUtils";
+import { resolveNotes } from "../utilities/resolveNotes";
 
-export const useNotes = () => {
-    const { session } = UserAuth();
-    const { player, loading: usePlayerLoading, error: usePlayerError } = usePlayer(session, {useData: true});
+export const useNotes = ({ userId }) => {
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const loadNotes = async () => {
-        setLoading(true);
-        setError(null);
+        console.log("useNotes: userId in useNotes: ", userId);
 
-        if (usePlayerLoading) {
-            console.log("useNotes: Player is loading, returning early.");
-            setLoading(false);
-            return;
-        }
-
-        if (player === null || player === undefined) {
-            setError("Player is null or undefined in useNotes.loadNotes");
-            setLoading(false);
-            usePlayerError("Player is null or undefined in useNotes.loadNotes");
-            return;
-        }
-
-        if (error || usePlayerError) {
-            console.log("useNotes: Error in usePlayer: ", error || usePlayerError);
-            setLoading(false);
-            return;
-        }
-        
-        console.log("Player in useNotes: ", player);
-        if (!player.internal_id) {
+        if (!userId) {
             setError("Player internal_id not available");
             setLoading(false);
             return;
         }
-        const result = await fetchPlayerNotes(player.internal_id);
-        console.log("Result from fetchPlayerNotes: ", result);
-        if (result.error) {
-            setError(error);
+
+        setLoading(true);
+        const { notes, status } = await resolveNotes(userId, { debounce: false, verbose: true});
+
+        if (status === "error") {
+            setError("Failed to fetch notes");
+            setNotes([]);
         } else {
-            console.log("useNotes data: ", result)
-            setNotes(result || []);
+            console.log("useNotes fetchNotes: ", notes);
+            setNotes(notes || []);
         }
 
         setLoading(false);
     }
 
     const deleteNote = async (noteId) => {
-        // I will likely need to change player into player if delete isn't working
-        setLoading(true);
-        setError(null);
-
-        if (!player.internal_id){
+        if (!userId){
             setError("Player not available")
-            setLoading(false);
             return;
         } 
 
-        const { error } = await deleteNoteService(player.internal_id, noteId);
-        if (error) {
-            setError(error);
+        setLoading(true);
+        const result = await deleteNoteService(userId, noteId);
+        if (result.error) {
+            setError(result?.error);
+            console.log("useNotes: deleteNoteService result", result)
+        } else {
+            await loadNotes();
         }
 
         setLoading(false);
     }
 
     useEffect(() => {
-        console.log("Session in useEffect: ", session);
-        console.log("Player in useEffect: ", player);
-
-        if (session && player && !usePlayerLoading) { loadNotes() };
-    }, [session, player]);
+        const cached = getCachedPlayerNotes()
+        if (cached?.notes) {
+            setNotes(cached.notes);
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
-        console.log("Notes state updated: ", notes);
-    }, [notes]);
+        if (userId) {
+            loadNotes();
+        }
+    }, [userId]);
 
     return { notes, loading, error, deleteNote, reloadNotes: loadNotes };
+
 };

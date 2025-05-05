@@ -1,21 +1,31 @@
 import { supabase } from "../supabaseClient";
 import { runSupabaseQuery } from "./runSupabaseQuery";
-import { resolvePlayer } from "./resolvePlayer";
 
-export const fetchPlayerNotes = async (sessionOrUserId, { single = false } = {}) => {
-    const player = await resolvePlayer(sessionOrUserId, {verbose: true});
-    const playerData = player?.data || player;
-    console.log("Player in fetchPlayerNotes: ", playerData);
+const NOTES_CACHE_KEY = "cached:notes";
+
+const buildCachePayload = (noteData) => ({
+    value: noteData
+    
+});
+
+export const fetchPlayerNotes = async (userId, { single = false } = {}) => {
+    console.log("noteUtils: Calling resolveNotes", userId)
+    const playerData = userId;
 
     if (!playerData) {
-        console.error("No player found for this user");
+        console.error("noteUtils: No player found for this user");
         return null;
     }
 
-    const query = supabase
+    if (!playerData || typeof userId !== "string") {
+        if (verbose) console.error("noteUtils: fetchPlayer: Invalid userId", playerData);
+        return null;
+    }
+
+    let query = supabase
         .from("Note")
         .select("*")
-        .eq("note_creator", playerData.internal_id)
+        .eq("note_creator", playerData)
         .order("created_at", {ascending: false});
 
     if (single) {
@@ -33,42 +43,101 @@ export const fetchPlayerNotes = async (sessionOrUserId, { single = false } = {})
     return data;
 };
 
-export const createNoteService = async (session, noteTitle, noteContent, {verbose = false} = {}) => {
-    
-    console.log("Session: ", session);
-    const player = await resolvePlayer( 
-        {session, verbose}
-    );
-
-    const playerData = player?.data || player;
-
-    console.log("Player: ", player);
+export const createNoteService = async (userId, noteTitle, noteContent, {verbose = true} = {}) => {
+    if (!userId) {
+        console.error("createNoteService: No userId provided");
+        return { error: "Missing userID" };
+    }
 
     const query = supabase
         .from('Note')
-        .insert([ {note_title: noteTitle,  note_content: noteContent, note_creator: playerData.internal_id} ])
+        .insert([ {note_title: noteTitle,  note_content: noteContent, note_creator: userId} ])
 
     if (verbose) {
-        console.log("Session: ", session, "\nNoteTitle: ", noteTitle, "\nNoteContent: ", noteContent, "\nQuery: ", query);
+        console.log("NoteTitle: ", noteTitle, "\nNoteContent: ", noteContent, "\nQuery: ", query);
     }
-    return runSupabaseQuery(query);
+    const { error } = await runSupabaseQuery(query);
+
+    if (error) {
+        console.error("createNoteService: Error inserting note: ", error);
+        return { error };
+    }
+
+    return { success: true };
     
 }
 
-export const deleteNoteService = async (sessionOrUserId, noteId) => {
-    const player = await resolvePlayer(sessionOrUserId, {verbose: true});
-    if (!player) {
-        console.error("No player found for this user");
-        return null;
+export const deleteNoteService = async (userId, noteId) => {
+    if (!userId) {
+        console.error("noteUtils: No player found for this user");
+        return { error: "No valid player ID" };
     }
-
-    console.log("PlayerID: ", player.internal_id, "NoteID: ", noteId);
 
     const query = supabase
         .from("Note")
         .delete()   
         .eq("note_id", noteId)
-        .eq("note_creator", playerData.internal_id);
+        .eq("note_creator", userId);
 
-    return await runSupabaseQuery(query);
+    const { error } = await runSupabaseQuery(query);
+    if (error) { 
+        console.error("noteUtils: Error fetching player notes: ", error);
+        return error;
+    }
+
+    return { success: true };
+}
+
+export const cachePlayerNotes = (noteData, options = {}) => {
+    const { verbose = true } = options;
+    localStorage.setItem(NOTES_CACHE_KEY, JSON.stringify(buildCachePayload(noteData)));
+    if (verbose) console.log("noteUtils: Cached player notes: ", noteData);
+}
+
+export const updateCachedPlayerNotes = (noteData, options = {}) => {
+    cachePlayerNotes(noteData, options);
+}
+
+export const getCachedPlayerNotes = ( options = {} ) => {
+    const { verbose = true } = options;
+
+    if (verbose) { console.log("noteUtils: Attempting getCachedPlayerNotes"); }
+    
+    try {
+        const raw = localStorage.getItem(NOTES_CACHE_KEY);
+        if (verbose) console.log("noteUtils: Raw: ", raw);
+        if (!raw || raw === null)  {
+            if (verbose) console.log("noteUtils: No cached player notes found");
+            return null;
+        }
+        const parsed = JSON.parse(raw);
+        if (verbose) { console.log("noteUtils: Parsed: ", parsed); }
+        return parsed.value;
+    } catch (err) {
+        if (verbose) console.error("Error parsing cached player notes: ", err);
+        return null;
+    }
+}
+
+export const fetchAndCacheNotes = async (userId, options = {}) => {
+    const { verbose = true } = options;
+    if (verbose) console.log("noteUtils: Attempting fetchAndCacheNotes: ", userId);
+
+
+    const notes = await fetchPlayerNotes(userId, { single: false });
+    if (verbose) console.log("noteUtils: Fetched notes: ", notes);
+    if (!notes) {
+        console.error("noteUtils: Error fetching notes: ", notes);
+        return null;
+    }
+
+    cachePlayerNotes(notes, options);
+    if (verbose) console.log("noteUtils: Cached notes: ", notes);
+    return notes;
+}
+
+export const clearCachedNotes = (options = {}) => {
+    const { verbose = true } = options;
+    localStorage.removeItem(NOTES_CACHE_KEY);
+    if (verbose) console.log("noteUtils: Cleared cached notes");
 }

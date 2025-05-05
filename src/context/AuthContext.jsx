@@ -6,6 +6,10 @@ import {
   clearCachedPlayer,
   updateCachedPlayer,
 } from "../utilities/playerUtils";
+import {
+  updateCachedPlayerNotes,
+  clearCachedNotes,
+} from "../utilities/noteUtils";
 import { useResolvePlayer } from "../hooks/useResolvePlayer";
 
 const AuthContext = createContext();
@@ -70,6 +74,7 @@ export const AuthContextProvider = ({ children }) => {
     setPlayer(null);
     setNotes([]);
     clearCachedPlayer();
+    clearCachedNotes();
     hasFetchedPlayer.current = false;
     return { success: true };
   };
@@ -147,28 +152,32 @@ export const AuthContextProvider = ({ children }) => {
           filter: `note_creator=eq.${session.user.id}`,
         },
         (payload) => {
-          if (payload.eventType === "INSERT") {
-            setNotes((prevNotes) => [...prevNotes, payload.new]);
-          } else if (payload.eventType === "UPDATE") {
-            setNotes((prevNotes) =>
-              prevNotes.map((note) =>
+          setNotes((prevNotes) => {
+            let updatedNotes;
+            if (payload.eventType === "INSERT") {
+              updatedNotes = [...prevNotes, payload.new];
+            } else if (payload.eventType === "UPDATE") {
+              updatedNotes = prevNotes.map((note) =>
                 note.note_id === payload.new.note_id ? payload.new : note
-              )
-            );
-          } else if (payload.eventType === "DELETE") {
-            setNotes((prevNotes) =>
-              prevNotes.filter((note) => note.note_id !== payload.old.note_id)
-            );
-          }
+              );
+            } else if (payload.eventType === "DELETE") {
+              updatedNotes = prevNotes.filter(
+                (note) => note.note_id !== payload.old.note_id
+              );
+            }
+            updateCachedPlayerNotes(updatedNotes);
+            return updatedNotes;
+          });
         }
       )
       .subscribe();
 
-    setLoading(false);
+    if (status === "fetched") { setLoading(false); }
 
     return () => {
       playerSub.unsubscribe();
       notesSub.unsubscribe();
+
     };
   }, [session?.user?.id]);
 
@@ -183,6 +192,7 @@ export const AuthContextProvider = ({ children }) => {
         setPlayer,
         loading,
         error,
+        status,
         setError,
       }}>
       {children}
