@@ -27,9 +27,10 @@ export function GamesDropdown() {
       setLoading(false);
       return;
     }
-
+    
+    setLoading(true);
     const { error } = await updatePlayerGamesPlayed(player?.internal_id, selectedGames);
-
+    
     if (error) {
       console.error("Error updating games played:", error);
       setError(error);
@@ -37,7 +38,9 @@ export function GamesDropdown() {
       console.log("Games played updated successfully");
     }
 
-    if (!loading || !player || playerLoading) {
+    setLoading(false);
+
+    if (!loading || !player || playerLoading || sessionLoading) {
       return <Spinner />;
     }
 

@@ -20,6 +20,7 @@ export const Signin = () => {
 
     const handleSignIn = async(e) => {
         e.preventDefault();
+        setLoading(true);
         const result = await signInUser(email, password);
 
         if (error) {
@@ -31,6 +32,8 @@ export const Signin = () => {
         } else {
             navigate("/dashboard");
         }
+
+        setLoading(false);
 
     }
 
