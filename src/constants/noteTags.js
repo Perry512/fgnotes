@@ -1,10 +1,10 @@
 export const NOTE_TAGS = Object.freeze({
-    Oki: "Oki",
-    Combo: "Combo",
-    Character_Specific: "Character Specific",
-    Neutral: "Neutral",
-    Spacing: "Spacing",
-    Weakness: "Weakness",
-    Mix: "Mix",
-    Player_Specific: "Player Specific",
+    OKI: { name:"Oki", color: "#4f46e5" },
+    COMBO: { name: "Combo", color: "#10B981" },
+    CHARACTER_SPECIFIC: { name: "Character Specific", color: "#10B981" },
+    NEUTRAL: { name: "Neutral", color: "#4f46e5" },  
+    SPACING: { name: "Spacing", color: "#F59E0B" }, 
+    WEAKNESS: { name: "Weakness", color: "#10B981" },
+    MIX: { name: "Mix", color: "#4f46e5" },
+    PLAYER_SPECIFIC: { name: "Player Specific", color: "#10B981" },
 })
