@@ -1,21 +1,25 @@
 import { Spinner } from "flowbite-react";
 import { NOTE_TAGS } from "../constants/noteTags";
+import { TagsDropdown } from "./TagsDropdown";
 
-export default function DisplayNotesFull({notes, loading, deleteNote, error}) {
-    console.log("Notes: ", notes);
+export default function DisplayNotesFull({
+  notes,
+  loading,
+  deleteNote,
+  error,
+}) {
+  console.log("Notes: ", notes);
 
-    const handleEditTags = (noteId) => {
-        console.log("edit tags for: ", noteId);
-    }
-
- return (
+  return (
     <div className="my-2 space-y">
       {loading && (
         <div className="text-right">
           <Spinner />
         </div>
       )}
-      {error && <p className="text-red-500">{error.message || JSON.stringify(error)}</p>}
+      {error && (
+        <p className="text-red-500">{error.message || JSON.stringify(error)}</p>
+      )}
       {!loading && !error && notes.length === 0 && <p>No notes found</p>}
 
       {!loading &&
@@ -24,18 +28,18 @@ export default function DisplayNotesFull({notes, loading, deleteNote, error}) {
           <div
             key={note.note_id}
             className="relative flex w-full max-w-2xl mx-auto border rounded-lg shadow-md overflow-hidden bg-gray-900"
-            style={{ minHeight: "300px" }}
-          >
+            style={{ minHeight: "300px" }}>
             {/* Left Section (Title + Content) */}
             <div className="flex-1 flex flex-col p-4 space-y-4">
               <h3 className="text-white text-lg font-bold border-b border-gray-700 pb-2">
                 {note.note_title || "Untitled"}
               </h3>
-              <p className="text-gray-300 flex-1">{note.note_content || "No content available"}</p>
+              <p className="text-gray-300 flex-1">
+                {note.note_content || "No content available"}
+              </p>
               <button
                 className="text-red-400 text-sm underline"
-                onClick={() => deleteNote(note.note_id)}
-              >
+                onClick={() => deleteNote(note.note_id)}>
                 Delete
               </button>
             </div>
@@ -53,12 +57,8 @@ export default function DisplayNotesFull({notes, loading, deleteNote, error}) {
                   />
                 ))}
               </div>
-              <button
-                className="w-6 h-6 mt-2 bg-yellow-400 text-black font-bold text-sm rounded-sm hover:bg-yellow-500"
-                onClick={() => handleEditTags(note.note_id)}
-              >
-                +
-              </button>
+              <TagsDropdown note={note} error={error}/>
+              
             </div>
           </div>
         ))}
