@@ -47,21 +47,24 @@ export const COMMANDCRABS = Object.freeze({
         "grabCharacter": "Laura",
         "grabGameOrigin": "Street Fighter V",
         "grabInput": "Half-circle back + Kick",
-        "displayDate": "May 13"
+        "displayDate": "May 13",
+        "ytLink": "https://www.youtube.com/embed/-9amIj9BYSs?si=UONT_OPXyf4SE6f9&amp;start=457",
       },
       {
-        "grabName": "Meat Squasher",
-        "grabCharacter": "Meat Squasher",
+        "grabName": "Moonsault Press",
+        "grabCharacter": "Hugo",
         "grabGameOrigin": "Street Fighter III: 2nd Impact",
         "grabInput": "Full Circle + Punch",
-        "displayDate": "May 14"
+        "displayDate": "May 14",
+        "ytLink": "https://www.youtube.com/embed/-nvwdEl5Hjw?si=Lu6FujRywLqbc7N-&amp;start=67",
       },
       {
         "grabName": "Colossal Crush",
         "grabCharacter": "Talos",
         "grabGameOrigin": "Rising Thunder",
         "grabInput": "Unique",
-        "displayDate": "May 15"
+        "displayDate": "May 15",
+        "ytLink": "https://www.youtube.com/embed/KH52CxklGX8?si=0jU6StEY7oTOS8s9&amp;start=67",
       },
       {
         "grabName": "Excellebella",
