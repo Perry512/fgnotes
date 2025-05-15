@@ -3,7 +3,7 @@ import { UserAuth } from "../context/AuthContext";
 import { GAMES } from "../constants/games";
 import { MultiSelectDropdown } from "./MultiSelectDropdown";
 import { usePlayer } from "../hooks/usePlayer";
-import { updatePlayerGamesPlayed } from "../utilities/updatePlayerGamesPlayed";
+import { updatePlayerField } from "../utilities/playerUtils";
 import { Spinner } from "flowbite-react";
 
 export function GamesDropdown() {
@@ -29,7 +29,7 @@ export function GamesDropdown() {
     }
     
     setLoading(true);
-    const { error } = await updatePlayerGamesPlayed(player?.internal_id, selectedGames);
+    const { error } = await updatePlayerField(player?.internal_id, "games_played", selectedGames);
     
     if (error) {
       console.error("Error updating games played:", error);

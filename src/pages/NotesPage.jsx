@@ -3,11 +3,17 @@ import DisplayNotesFull from "../components/DisplayNotesFull";
 import PostNote from "../components/PostNote";
 import { useNotes } from "../hooks/useNotes";
 import { UserAuth } from "../context/AuthContext";
+import { Spinner } from "flowbite-react";
 
 const NotesPage = () => {
 const { player } = UserAuth();
-if (!player) return;
 const { notes, loading, error, deleteNote, reloadNotes } = useNotes({ userId: player?.internal_id })
+
+if (!player) return (
+    <div className="flex justify-center items-center h-screen">
+        <Spinner />
+    </div>
+);
 
     return (
         <>
