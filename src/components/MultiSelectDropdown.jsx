@@ -9,6 +9,7 @@ export const MultiSelectDropdown = ({
   onChange,
   onSave,
   closeOnSave = true,
+  chevron = true,
 }) => {
   const menuRef = useRef();
 
@@ -24,7 +25,7 @@ export const MultiSelectDropdown = ({
     <Menu as="div" className="relative inline-block text-left w-full">
       <MenuButton className="inline-flex justify-between items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-red-700 ring-1 shadow-xs ring-gray-300 hover:bg-gray-50">
         {label}
-        <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" />
+        { chevron && <ChevronDownIcon className="ml-2 h-5 w-5 text-gray-400" />}
       </MenuButton>
 
       <MenuItems

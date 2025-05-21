@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Spinner } from "flowbite-react";
 import { NOTE_TAGS } from "../constants/noteTags";
 import { TagsDropdown } from "./TagsDropdown";
@@ -8,7 +9,23 @@ export default function DisplayNotesFull({
   deleteNote,
   error,
 }) {
+
+  const [hoverTag, setHoverTag] = useState(null);
+
   console.log("Notes: ", notes);
+
+    const showTagTooltip = (e, tagKey) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setHoverTag({
+            key: tagKey,
+            name: NOTE_TAGS[tagKey]?.name || tagKey,
+            x: rect.right + 8,
+            y: rect.top + rect.height / 2,
+        });
+    };
+
+  const hideTagTooltip = () => setHoverTag(null);
+
 
   return (
     <div className="my-2 space-y">
@@ -47,15 +64,36 @@ export default function DisplayNotesFull({
             {/* Right Sidebar (Tags + Add) */}
             <div className="flex flex-col justify-between bg-gray-800 p-1">
               <div className="flex flex-col items-center space-y-1">
-                {note.note_tag?.map((tag, i) => (
-                  <div
-                    key={`${note.note_id}-${tag}-${i}`}
-                    className="w-6 h-6 rounded-sm"
+              {note.note_tag?.map((tag, i) => (
+                <div
+                  key={`${note.note_id}-${tag}-${i}`}
+                  className="relative w-6 h-6 rounded-sm cursor-pointer flex items-center justify-center text-white text-xs font-semibold"
+                  style={{
+                    backgroundColor: NOTE_TAGS[tag]?.color || "#6B7280",
+                  }}
+                  onMouseEnter={(e) => showTagTooltip(e, tag)}
+                  onMouseLeave={hideTagTooltip}
+                >
+                  <span className="ml-2 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    {NOTE_TAGS[tag]?.name?.[0] || tag[0]}
+                  </span>
+                </div>
+              ))}
+
+              {hoverTag && (
+                    <div
+                    className="fixed px-2 py-1 text-xs text-white rounded shadow-lg z-50 pointer-events-none transition-all duration-200 ease-out hover:scale-100"                      
                     style={{
-                      backgroundColor: NOTE_TAGS[tag]?.color || "#6B7280",
-                    }}
-                  />
-                ))}
+                        top: `${hoverTag.y}px`,
+                        left: `${hoverTag.x - 10}px`,
+                        transform: 'translateY(-50%) translateX(-8px)',
+                        backgroundColor: NOTE_TAGS[hoverTag.key]?.color || "#374151",
+                        opacity:1,
+                      }}
+                    >
+                      {hoverTag.name}
+                    </div>
+                  )}
               </div>
               <TagsDropdown note={note} error={error}/>
               

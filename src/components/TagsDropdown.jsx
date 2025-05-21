@@ -45,6 +45,7 @@ export function TagsDropdown({note, loading: parentLoading}) {
             }}
             onSave={handleSave}
             error={error}
+            chevron={false}
         />
     )
 }
