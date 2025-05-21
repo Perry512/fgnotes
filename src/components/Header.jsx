@@ -20,7 +20,7 @@ export default function Header({toggleSidebar}) {
             </div>
 
             <div className="text-lg font-semibold tracking-wide text-slate-100">
-                FGC Notes
+                Knowledge Check
             </div>
 
             <div className="flex items-center gap-4">
