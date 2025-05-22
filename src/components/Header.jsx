@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Menu, Megaphone } from 'lucide-react';
 import { UserAuth } from "../context/AuthContext";
 
-export default function Header({toggleSidebar}) {
+export default function Header({toggleSidebar, toggleAnnouncements}) {
     const { player } = UserAuth();
     const playerData = player?.data || player;
 
@@ -24,7 +24,10 @@ export default function Header({toggleSidebar}) {
             </div>
 
             <div className="flex items-center gap-4">
-                <button className="p-2 hover:bg-slate-700 rounded-lg transition-colors">
+                <button 
+                    className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
+                    onClick={toggleAnnouncements}    
+                >
                     <Megaphone size={24} />
                 </button>
             </div>
