@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Spinner } from "flowbite-react";
 import { NOTE_TAGS } from "../constants/noteTags";
 import { TagsDropdown } from "./TagsDropdown";
@@ -9,24 +8,6 @@ export default function DisplayNotesFull({
   deleteNote,
   error,
 }) {
-
-  const [hoverTag, setHoverTag] = useState(null);
-
-  console.log("Notes: ", notes);
-
-    const showTagTooltip = (e, tagKey) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        setHoverTag({
-            key: tagKey,
-            name: NOTE_TAGS[tagKey]?.name || tagKey,
-            x: rect.right + 8,
-            y: rect.top + rect.height / 2,
-        });
-    };
-
-  const hideTagTooltip = () => setHoverTag(null);
-
-
   return (
     <div className="my-2 space-y">
       {loading && (
@@ -44,8 +25,8 @@ export default function DisplayNotesFull({
         notes.map((note) => (
           <div
             key={note.note_id}
-            className="relative flex w-full max-w-2xl mx-auto border rounded-lg shadow-md overflow-hidden bg-gray-900"
-            style={{ minHeight: "300px" }}>
+            className="relative flex w-full max-w-2xl mx-auto border rounded-lg shadow-md overflow-visible bg-gray-900"            style={{ minHeight: "300px" }}
+          >
             {/* Left Section (Title + Content) */}
             <div className="flex-1 flex flex-col p-4 space-y-4">
               <h3 className="text-white text-lg font-bold border-b border-gray-700 pb-2">
@@ -56,7 +37,8 @@ export default function DisplayNotesFull({
               </p>
               <button
                 className="text-red-400 text-sm underline"
-                onClick={() => deleteNote(note.note_id)}>
+                onClick={() => deleteNote(note.note_id)}
+              >
                 Delete
               </button>
             </div>
@@ -64,39 +46,29 @@ export default function DisplayNotesFull({
             {/* Right Sidebar (Tags + Add) */}
             <div className="flex flex-col justify-between bg-gray-800 p-1">
               <div className="flex flex-col items-center space-y-1">
-              {note.note_tag?.map((tag, i) => (
-                <div
-                  key={`${note.note_id}-${tag}-${i}`}
-                  className="relative w-6 h-6 rounded-sm cursor-pointer flex items-center justify-center text-white text-xs font-semibold"
-                  style={{
-                    backgroundColor: NOTE_TAGS[tag]?.color || "#6B7280",
-                  }}
-                  onMouseEnter={(e) => showTagTooltip(e, tag)}
-                  onMouseLeave={hideTagTooltip}
-                >
-                  <span className="ml-2 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    {NOTE_TAGS[tag]?.name?.[0] || tag[0]}
-                  </span>
-                </div>
-              ))}
-
-              {hoverTag && (
-                    <div
-                    className="fixed px-2 py-1 text-xs text-white rounded shadow-lg z-50 pointer-events-none transition-all duration-200 ease-out hover:scale-100"                      
-                    style={{
-                        top: `${hoverTag.y}px`,
-                        left: `${hoverTag.x - 10}px`,
-                        transform: 'translateY(-50%) translateX(-8px)',
-                        backgroundColor: NOTE_TAGS[hoverTag.key]?.color || "#374151",
-                        opacity:1,
-                      }}
-                    >
-                      {hoverTag.name}
-                    </div>
-                  )}
+                {note.note_tag?.map((tag, i) => (
+                 <div
+                 key={`${note.note_id}-${tag}-${i}`}
+                 className="relative group w-6 h-6 rounded-sm cursor-pointer flex items-center justify-center text-white text-xs font-semibold z-10"
+                 style={{
+                   backgroundColor: NOTE_TAGS[tag]?.color || "#6B7280",
+                 }}
+               >
+                 {NOTE_TAGS[tag]?.name?.[0] || tag[0]}
+               
+                 <div
+                   className="absolute top-1/2 left-full transform -translate-y-1/2 translate-x-1 bg-gray-800 text-white text-xs px-2 py-0.5 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 pointer-events-none z-50"
+                   style={{
+                     backgroundColor: NOTE_TAGS[tag]?.color || "#374151",
+                   }}
+                 >
+                   {NOTE_TAGS[tag]?.name || tag}
+                 </div>
+               </div>               
+                ))}
               </div>
-              <TagsDropdown note={note} error={error}/>
-              
+
+              <TagsDropdown note={note} error={error} />
             </div>
           </div>
         ))}
