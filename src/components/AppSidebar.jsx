@@ -1,5 +1,5 @@
 import { Badge, Sidebar, SidebarCTA, SidebarItem, SidebarItemGroup, SidebarItems } from "flowbite-react";
-import { HiArrowSmRight, HiChartPie, HiInbox, HiShoppingBag, HiTable, HiUser, HiViewBoards } from "react-icons/hi";
+import { HiOutlineUser, HiClipboardList } from "react-icons/hi";
 
 export function AppSidebar({ open, setOpen, setActivePage }) {  
     if(!open) return null;
@@ -9,13 +9,13 @@ export function AppSidebar({ open, setOpen, setActivePage }) {
             <SidebarItems>
                 <SidebarItemGroup>
                     <SidebarItem 
-                        icon={HiChartPie}
+                        icon={HiClipboardList}
                         onClick={() => {setActivePage("notes")}}
                     >
                         Notes
                     </SidebarItem>
                     <SidebarItem 
-                        icon={HiViewBoards}
+                        icon={HiOutlineUser}
                         onClick={() => {setActivePage("player")}}
                     >
                         Player Info
