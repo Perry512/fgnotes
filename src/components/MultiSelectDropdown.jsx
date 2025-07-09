@@ -30,7 +30,7 @@ export const MultiSelectDropdown = ({
 
       <MenuItems
         ref={menuRef}
-        className="right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-none"
+        className="absolute left-0 top-full z-50 mt-1 min-w-[14rem] origin-top-left rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-none"
       >
         <div className="py-2 px-2 max-h-60 overflow-y-auto">
           {options.map((option, idx) => (
