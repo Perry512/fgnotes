@@ -8,13 +8,15 @@ import { Spinner } from "flowbite-react";
 
 export function GamesDropdown() {
   const { session, loading: sessionLoading, player } = UserAuth();
-  const { loading: playerLoading, error: playerError } = usePlayer(session, {useData: true});
+  const { loading: playerLoading, error: playerError } = usePlayer(session, {
+    useData: true,
+  });
   const [selectedGames, setSelectedGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   console.log("Player status GamesDropdown: ", player);
-  
+
   useEffect(() => {
     if (player?.games_played) {
       setSelectedGames(player.games_played);
@@ -27,7 +29,7 @@ export function GamesDropdown() {
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     const { error } = await updatePlayerField(player?.internal_id, "games_played", selectedGames);
     
@@ -40,12 +42,14 @@ export function GamesDropdown() {
 
     setLoading(false);
 
-    if (!loading || !player || playerLoading || sessionLoading) {
+    if (loading || !player || playerLoading || sessionLoading) {
       return <Spinner />;
     }
 
     if (error || playerError) {
-      return <p className="text-red-500">{error?.message || playerError?.message}</p>;
+      return (
+        <p className="text-red-500">{error?.message || playerError?.message}</p>
+      );
     }
   };
 

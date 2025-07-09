@@ -1,5 +1,7 @@
+import { Notebook } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import { runSupabaseQuery } from "./runSupabaseQuery";
+import { data } from "react-router-dom";
 
 const NOTES_CACHE_KEY = "cached:notes";
 
@@ -141,3 +143,31 @@ export const clearCachedNotes = (options = {}) => {
     localStorage.removeItem(NOTES_CACHE_KEY);
     if (verbose) console.log("noteUtils: Cleared cached notes");
 }
+
+export const updateNoteTag = async (note_id, newTags, options = {}) => {
+    const { verbose = true } = options;
+    if (!note_id || !Array.isArray(newTags)) {
+        if (verbose) console.error("noteUtils: Invalid arguments for updateNoteTag");
+        return { data: null, error: "Invalid arguments"}
+    }
+
+    const query = await supabase
+        .from('Note')
+        .upsert({ note_id, note_tag: newTags })
+        .select();
+    
+    const { data, error } = await runSupabaseQuery(query);
+
+    if (error) {
+        if (verbose) console.error("noteUtils: Error updating Note Tags: ", error);
+        return { error };
+    }
+
+    if (data) {
+        if (verbose) console.log("noteUtils: Note Tag updated sucessfully: ", data);
+        cachePlayerNotes(data, { verbose })
+    }
+    
+    return { data, error };
+
+};
