@@ -9,7 +9,11 @@ const NotesPage = () => {
 const { player } = UserAuth();
 const { notes, loading, error, deleteNote, reloadNotes } = useNotes({ userId: player?.internal_id })
 
-if (!player) return <Spinner />;
+if (!player) return (
+    <div className="flex justify-center items-center h-screen">
+        <Spinner />
+    </div>
+);
 
     return (
         <>
