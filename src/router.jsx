@@ -10,8 +10,8 @@ import PlayerPage from "./pages/PlayerPage";
 
 export const router = createBrowserRouter([
     { path: "/", element: <App /> },
-    { path: "/signup", element: <Signup /> },
     { path: "/signin", element: <Signin /> },
+    { path: "/signup", element: <Signup /> },
     {   
         path: "/dashboard", 
         element: 

@@ -42,7 +42,7 @@ export const Signin = () => {
             <form onSubmit={handleSignIn} className="max-w-md m-auto pt-24">
                 <h2 className="font-bold pb-2"> Sign In </h2>
                 <p>
-                    New here? <Link className="hover:cursor:pointer" to='/signup'> Click here </Link>
+                    New here? <Link className="hover:cursor:pointer" to='/signup'> Sign up here </Link>
                 </p>
                 <div className="flex flex-col py-4">
                     <input onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="p-3 mt-2" type="email"/>

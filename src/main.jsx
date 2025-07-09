@@ -9,7 +9,7 @@ import { AuthContextProvider } from './context/AuthContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-      <ErrorBoundary>
+      <ErrorBoundary fallback={<div> <p> Something went wrong, please refresh the page </p></div>}>
       <AuthContextProvider>
         <RouterProvider router={router} />
       </AuthContextProvider>
