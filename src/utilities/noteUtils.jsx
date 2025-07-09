@@ -153,8 +153,8 @@ export const updateNoteTag = async (note_id, newTags, options = {}) => {
 
     const query = await supabase
         .from('Note')
-        .upsert({ note_tag: newTags })
-        .eq({note_id});
+        .upsert({ note_id, note_tag: newTags })
+        .select();
     
     const { data, error } = await runSupabaseQuery(query);
 

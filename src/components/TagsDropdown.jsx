@@ -42,10 +42,22 @@ export function TagsDropdown({note, loading: parentLoading}) {
 
     return (
         <MultiSelectDropdown
-            label="Note Tags"
-            options={Object.values(NOTE_TAGS)}
-            selected={currentTags}
-            onChange={setCurrentTags}
+            options={
+                NOTE_TAGS
+                ? Object.keys(NOTE_TAGS).map((key) => NOTE_TAGS[key].name)
+                : []
+            }
+            selected={
+                NOTE_TAGS && currentTags
+                ? currentTags.map((key) => NOTE_TAGS[key]?.name || key)
+                : []
+            }
+            onChange={(selectedNames) => {
+                const updatedKeys = selectedNames.map((name) =>
+                    Object.keys(NOTE_TAGS).find((key) => NOTE_TAGS[key].name === name)
+            );
+    setCurrentTags(updatedKeys);
+  }}
             onSave={handleSave}
             error={error}
         />
