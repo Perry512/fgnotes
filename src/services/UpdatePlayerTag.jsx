@@ -27,7 +27,7 @@ export const UpdatePlayerTag = () => {
       session?.user?.id,
       "tag",
       tag.trim(),
-      { verbose: true }
+      { verbose: false }
     );
 
     if (updateError) {
@@ -37,7 +37,7 @@ export const UpdatePlayerTag = () => {
       }, 3000);
     } else if (data) {
       setPlayer(data);
-      updateCachedPlayer(data, { verbose: true });
+      updateCachedPlayer(data, { verbose: false });
       setTag("");
     }
 

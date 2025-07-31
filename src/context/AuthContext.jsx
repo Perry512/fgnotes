@@ -80,14 +80,14 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    console.log("AuthContextProvider mounted");
+    //console.log("AuthContextProvider mounted");
     let mounted = true;
 
     const initAuth = async () => {
       const { data } = await supabase.auth.getSession();
       if (!mounted) return;
 
-      console.log("AuthContextProvider: initAuth: ", data);
+      //console.log("AuthContextProvider: initAuth: ", data);
       setSession(data.session ?? null);
       setLoading(false);
     }
@@ -134,7 +134,7 @@ export const AuthContextProvider = ({ children }) => {
           filter: `internal_id=eq.${session.user.id}`,
         },
         (payload) => {
-          console.log("Player created: ", payload.new);
+          //console.log("Player created: ", payload.new);
           updateCachedPlayer(payload.new);
           setPlayer(payload.new);
         }

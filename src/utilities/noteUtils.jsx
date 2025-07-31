@@ -15,12 +15,12 @@ export const fetchPlayerNotes = async (userId, { single = false } = {}) => {
     const playerData = userId;
 
     if (!playerData) {
-        console.error("noteUtils: No player found for this user");
+        //console.error("noteUtils: No player found for this user");
         return null;
     }
 
     if (!playerData || typeof userId !== "string") {
-        if (verbose) console.error("noteUtils: fetchPlayer: Invalid userId", playerData);
+        // console.error("noteUtils: fetchPlayer: Invalid userId", playerData);
         return null;
     }
 
@@ -34,20 +34,20 @@ export const fetchPlayerNotes = async (userId, { single = false } = {}) => {
         query = query.limit(1);
     }
 
-    console.log("Running Supabase query: ", query);
+    //console.log("Running Supabase query: ", query);
     const {data, error} = await runSupabaseQuery(query);
     if (error) {
         console.error("Error fetching player notes: ", error);
         return [];
     }
 
-    console.log("Fetched player notes: ", data);
+    //console.log("Fetched player notes: ", data);
     return data;
 };
 
-export const createNoteService = async (userId, noteTitle, noteContent, {verbose = true} = {}) => {
+export const createNoteService = async (userId, noteTitle, noteContent, {verbose = false} = {}) => {
     if (!userId) {
-        console.error("createNoteService: No userId provided");
+        //console.error("createNoteService: No userId provided");
         return { error: "Missing userID" };
     }
 
@@ -56,12 +56,12 @@ export const createNoteService = async (userId, noteTitle, noteContent, {verbose
         .insert([ {note_title: noteTitle,  note_content: noteContent, note_creator: userId} ])
 
     if (verbose) {
-        console.log("NoteTitle: ", noteTitle, "\nNoteContent: ", noteContent, "\nQuery: ", query);
+        //console.log("NoteTitle: ", noteTitle, "\nNoteContent: ", noteContent, "\nQuery: ", query);
     }
     const { error } = await runSupabaseQuery(query);
 
     if (error) {
-        console.error("createNoteService: Error inserting note: ", error);
+        //console.error("createNoteService: Error inserting note: ", error);
         return { error };
     }
 
@@ -71,7 +71,7 @@ export const createNoteService = async (userId, noteTitle, noteContent, {verbose
 
 export const deleteNoteService = async (userId, noteId) => {
     if (!userId) {
-        console.error("noteUtils: No player found for this user");
+        // console.error("noteUtils: No player found for this user");
         return { error: "No valid player ID" };
     }
 
@@ -83,7 +83,7 @@ export const deleteNoteService = async (userId, noteId) => {
 
     const { error } = await runSupabaseQuery(query);
     if (error) { 
-        console.error("noteUtils: Error fetching player notes: ", error);
+        // console.error("noteUtils: Error fetching player notes: ", error);
         return error;
     }
 
@@ -91,7 +91,7 @@ export const deleteNoteService = async (userId, noteId) => {
 }
 
 export const cachePlayerNotes = (noteData, options = {}) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
     localStorage.setItem(NOTES_CACHE_KEY, JSON.stringify(buildCachePayload(noteData)));
     if (verbose) console.log("noteUtils: Cached player notes: ", noteData);
 }
@@ -101,7 +101,7 @@ export const updateCachedPlayerNotes = (noteData, options = {}) => {
 }
 
 export const getCachedPlayerNotes = ( options = {} ) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
 
     if (verbose) { console.log("noteUtils: Attempting getCachedPlayerNotes"); }
     
@@ -122,7 +122,7 @@ export const getCachedPlayerNotes = ( options = {} ) => {
 }
 
 export const fetchAndCacheNotes = async (userId, options = {}) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
     if (verbose) console.log("noteUtils: Attempting fetchAndCacheNotes: ", userId);
 
 
@@ -139,13 +139,13 @@ export const fetchAndCacheNotes = async (userId, options = {}) => {
 }
 
 export const clearCachedNotes = (options = {}) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
     localStorage.removeItem(NOTES_CACHE_KEY);
     if (verbose) console.log("noteUtils: Cleared cached notes");
 }
 
 export const updateNoteTag = async (note_id, newTags, options = {}) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
     if (!note_id || !Array.isArray(newTags)) {
         if (verbose) console.error("noteUtils: Invalid arguments for updateNoteTag");
         return { data: null, error: "Invalid arguments"}

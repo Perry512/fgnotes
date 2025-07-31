@@ -30,7 +30,7 @@ export const Signup = () => {
                 setError(result.error || "An error occurred during signup.");
             }
         } catch (error) {
-            setError("an error occured")
+            setError("an error occured", error)
         } finally {
             setLoading(false);
         }

@@ -3,7 +3,7 @@ import { supabase } from "../supabaseClient";
 import { runSupabaseQuery } from "./runSupabaseQuery";
 
 const PLAYER_CACHE_KEY = "cached:player";
-const EXPIRY_MS = 1000 * 60 * 5; // 5 mins
+const EXPIRY_MS = 1000 * 60 * 10; // 10 mins
 
 const buildCachePayload = (data) => ({
     value: data,
@@ -12,7 +12,7 @@ const buildCachePayload = (data) => ({
 });
 
 export const fetchAndCachePlayer = async (userId, options = {}) => {
-    const { verbose = true} = options;
+    const { verbose = false} = options;
 
     if (!userId || typeof userId !== "string") {
         if (verbose) console.error("fetchAndCachePlayer: Invalid userId", userId);
@@ -39,7 +39,7 @@ export const fetchAndCachePlayer = async (userId, options = {}) => {
 }
 
 export const fetchPlayer = async (userId, options = {}) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
     if (verbose) { console.log("playerUtils: Attempting fetchPlayer: ", userId); }
 
     const query = await supabase
@@ -61,7 +61,7 @@ export const fetchPlayer = async (userId, options = {}) => {
 }
 
 export const cachePlayer = (playerData, options = {}) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
     localStorage.setItem(PLAYER_CACHE_KEY, JSON.stringify(buildCachePayload(playerData)));
     if (verbose) console.log("playerUtils: Cached player: ", playerData);
 }
@@ -71,13 +71,13 @@ export const updateCachedPlayer = (playerData, options = {}) => {
 }
 
 export const getCachedPlayer = ( options = {} ) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
 
     if (verbose) { console.log("playerUtils: Attempting getCachedPlayer"); }
     
     try {
         const raw = localStorage.getItem(PLAYER_CACHE_KEY);
-        console.log("playerUtils: Raw: ", raw);
+        if (verbose) console.log("playerUtils: Raw: ", raw);
         if (!raw || raw === null)  {
             if (verbose) console.log("playerUtils: No cached player found");
             return null;
@@ -120,13 +120,13 @@ export const sanitizeUserId = (playerData) => {
 }
 
 export const clearCachedPlayer = (options = {}) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
     localStorage.removeItem(PLAYER_CACHE_KEY);
     if (verbose) { console.log("playerUtils: Cleared cached player"); }
 };
 
 export const updatePlayerField = async (userId, field, value, options = {}) => {
-    const { verbose = true } = options;
+    const { verbose = false } = options;
     if (!userId || !field) {
         verbose ?? console.error("playerUtils: Invalid arguments for updatePlayerField: ", userId, field, value);
         return { data: null, error: "Invalid arguments" };

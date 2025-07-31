@@ -2,13 +2,13 @@ import { useEffect, useState }  from "react";
 import { deleteNoteService, fetchPlayerNotes, getCachedPlayerNotes } from "../utilities/noteUtils";
 import { resolveNotes } from "../utilities/resolveNotes";
 
-export const useNotes = ({ userId }) => {
+export const useNotes = ({ userId , verbose }) => {
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const loadNotes = async () => {
-        console.log("useNotes: userId in useNotes: ", userId);
+        if (verbose) console.log("useNotes: userId in useNotes: ", userId);
 
         if (!userId) {
             setError("Player internal_id not available");
@@ -23,7 +23,7 @@ export const useNotes = ({ userId }) => {
             setError("Failed to fetch notes");
             setNotes([]);
         } else {
-            console.log("useNotes fetchNotes: ", notes);
+            if (verbose) console.log("useNotes fetchNotes: ", notes);
             setNotes(notes || []);
         }
 
@@ -40,7 +40,7 @@ export const useNotes = ({ userId }) => {
         const result = await deleteNoteService(userId, noteId);
         if (result.error) {
             setError(result?.error);
-            console.log("useNotes: deleteNoteService result", result)
+            if (verbose) console.log("useNotes: deleteNoteService result", result);
         } else {
             await loadNotes();
         }

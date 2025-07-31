@@ -17,7 +17,7 @@ export default function PostNote({ reloadNotes }) {
     setError('');
 
     try {
-      const result = await createNoteService(session?.user?.id, title, content, { verbose: true });
+      const result = await createNoteService(session?.user?.id, title, content, { verbose: false });
 
       if (result.success) {
         setTitle("");

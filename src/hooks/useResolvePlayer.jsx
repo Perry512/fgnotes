@@ -2,17 +2,17 @@ import { useEffect } from "react";
 import { getCachedPlayer, fetchAndCachePlayer, updateCachedPlayer, clearCachedPlayer } from "../utilities/playerUtils";
 import { resolvePlayer } from "../utilities/resolvePlayer";
 
-export const useResolvePlayer = ({ userId, accessToken, setPlayer, setStatus }) => {
+export const useResolvePlayer = ({ userId, accessToken, setPlayer, setStatus, verbose }) => {
 
     useEffect(() => {
         const fetchPlayer = async () => {
             if (!userId || typeof userId !== "string") {
-                console.log("useResolvePlayer: Invalid userId, ", userId);
+                if (verbose) console.log("useResolvePlayer: Invalid userId, ", userId);
                 setStatus("error");
                 return;
             }
 
-            const cached = getCachedPlayer({ verbose: true });
+            const cached = getCachedPlayer({ verbose: false });
 
             const isValidCached = cached && typeof cached === "object" && !cached.code && cached.internal_id;
 
@@ -21,10 +21,10 @@ export const useResolvePlayer = ({ userId, accessToken, setPlayer, setStatus }) 
                 setStatus(accessToken ?  "stale_cache_with_token" : "cached");
 
                 if (accessToken) {
-                    const fresh = await fetchAndCachePlayer(userId, { verbose: true });
+                    const fresh = await fetchAndCachePlayer(userId, { verbose: false });
                     if (fresh) {
                         setPlayer(fresh);
-                        updateCachedPlayer(fresh, { verbose: true });
+                        updateCachedPlayer(fresh, { verbose: false });
                         setStatus("fresh_cache_with_token");
                     }
                 }
@@ -37,7 +37,7 @@ export const useResolvePlayer = ({ userId, accessToken, setPlayer, setStatus }) 
                 clearCachedPlayer({ verbose: true });
             }
 
-            let resolved = await resolvePlayer(userId, { verbose: true });
+            let resolved = await resolvePlayer(userId, { verbose: false });
 
             if (!resolved) {
                 

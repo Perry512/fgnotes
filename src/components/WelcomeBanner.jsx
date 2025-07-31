@@ -1,5 +1,4 @@
 import React from "react";
-import { getCachedPlayer } from "../utilities/playerUtils";
 import { UserAuth } from "../context/AuthContext";
 
 const WelcomeBanner = () => {
